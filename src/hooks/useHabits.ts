@@ -32,12 +32,11 @@ export const useHabits = () => {
         const habits = habitsRes.data.map(h => ({
           id: h.id,
           name: h.name,
-          description: h.description,
           frequency: h.frequency,
           timesPerWeek: h.times_per_week,
           specificDays: h.specific_days,
           color: h.color,
-          icon: h.icon,
+          emoji: h.icon,
           createdAt: new Date(h.created_at).toISOString().split('T')[0]
         }));
 
@@ -72,12 +71,11 @@ export const useHabits = () => {
     supabase.from('habits').insert({
       id,
       name: habit.name,
-      description: habit.description,
       frequency: habit.frequency,
       times_per_week: habit.timesPerWeek,
       specific_days: habit.specificDays,
       color: habit.color,
-      icon: habit.icon,
+      icon: habit.emoji,
       created_at: createdAt
     }).then(res => { if (res.error) console.error(res.error); });
 
@@ -92,12 +90,11 @@ export const useHabits = () => {
     
     const dbUpdates: any = {};
     if (updates.name !== undefined) dbUpdates.name = updates.name;
-    if (updates.description !== undefined) dbUpdates.description = updates.description;
     if (updates.frequency !== undefined) dbUpdates.frequency = updates.frequency;
     if (updates.timesPerWeek !== undefined) dbUpdates.times_per_week = updates.timesPerWeek;
     if (updates.specificDays !== undefined) dbUpdates.specific_days = updates.specificDays;
     if (updates.color !== undefined) dbUpdates.color = updates.color;
-    if (updates.icon !== undefined) dbUpdates.icon = updates.icon;
+    if (updates.emoji !== undefined) dbUpdates.icon = updates.emoji;
 
     supabase.from('habits').update(dbUpdates).eq('id', id)
       .then(res => { if (res.error) console.error(res.error); });
