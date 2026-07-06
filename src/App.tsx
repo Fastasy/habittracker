@@ -30,7 +30,7 @@ const AppContent: React.FC = () => {
   } = useHabits();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white transition-colors duration-300">
       <Sidebar
         currentView={currentView}
         onViewChange={setCurrentView}

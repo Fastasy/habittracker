@@ -66,14 +66,14 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Track your progress over time</p>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Analytics</h2>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-1">Track your progress over time</p>
           </div>
         </div>
-        <div className="text-center py-24 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
+        <div className="text-center py-24 bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900">
           <div className="text-6xl mb-6">📊</div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">No data yet</h3>
-          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3">No data yet</h3>
+          <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
             Create some habits and start checking them off to see your analytics here.
           </p>
         </div>
@@ -86,19 +86,19 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Your habit performance overview</p>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Analytics</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-1">Your habit performance overview</p>
         </div>
         {/* Date range filter */}
-        <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
+        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
           {FILTER_OPTIONS.map(opt => (
             <button
               key={opt.value}
               onClick={() => setDateFilter(opt.value)}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 dateFilter === opt.value
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               {opt.label}

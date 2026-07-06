@@ -23,12 +23,12 @@ const CustomTooltip: React.FC<{
   if (active && payload && payload.length) {
     const { date, completed, total } = payload[0].payload;
     return (
-      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg px-3 py-2">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+      <div className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg px-3 py-2">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">
           {format(parseISO(date), 'EEE, MMM d')}
         </p>
-        <p className="text-sm font-bold text-violet-600 dark:text-violet-400">{payload[0].value}%</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500">{completed}/{total} habits</p>
+        <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">{payload[0].value}%</p>
+        <p className="text-xs text-zinc-400 dark:text-zinc-500">{completed}/{total} habits</p>
       </div>
     );
   }
@@ -37,9 +37,9 @@ const CustomTooltip: React.FC<{
 
 const DailyBarChart: React.FC<DailyBarChartProps> = ({ data, title }) => {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{title}</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Daily completion rate</p>
+    <div className="bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900 p-6">
+      <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">{title}</h3>
+      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Daily completion rate</p>
       <div className="h-48">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>

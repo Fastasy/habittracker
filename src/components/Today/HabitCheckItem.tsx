@@ -47,8 +47,8 @@ const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onTog
     <div
       className={`relative flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer select-none group ${
         completed
-          ? 'bg-gray-50 dark:bg-gray-800/40 border-gray-100 dark:border-gray-800/60'
-          : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 active:scale-[0.99]'
+          ? 'bg-white dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-900/60'
+          : 'bg-white dark:bg-black border-zinc-200 dark:border-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md dark:hover:shadow-black/20 active:scale-[0.99]'
       }`}
       onClick={handleToggle}
     >
@@ -110,13 +110,13 @@ const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onTog
         <p
           className={`font-semibold transition-all duration-300 truncate ${
             completed
-              ? 'text-gray-400 dark:text-gray-500 line-through decoration-gray-300 dark:decoration-gray-600'
-              : 'text-gray-900 dark:text-white'
+              ? 'text-zinc-400 dark:text-zinc-500 line-through decoration-zinc-300 dark:decoration-zinc-600'
+              : 'text-zinc-900 dark:text-white'
           }`}
         >
           {habit.name}
         </p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+        <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
           {habit.frequency === 'daily' && 'Every day'}
           {habit.frequency === 'specific_days' &&
             (habit.specificDays ?? [])
@@ -143,7 +143,7 @@ const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onTog
 
       {/* Uncompleted tap hint */}
       {!completed && (
-        <div className="flex-shrink-0 text-gray-200 dark:text-gray-700 group-hover:text-gray-300 dark:group-hover:text-gray-600 transition-colors">
+        <div className="flex-shrink-0 text-zinc-200 dark:text-zinc-700 group-hover:text-zinc-300 dark:group-hover:text-zinc-600 transition-colors">
           <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center">
             <Check className="w-3 h-3" strokeWidth={3} />
           </div>

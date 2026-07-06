@@ -42,9 +42,9 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
   }, [weeks, today]);
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Activity Heatmap</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Last 6 months — daily completion intensity</p>
+    <div className="bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900 p-6">
+      <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-6">Activity Heatmap</h3>
+      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">Last 6 months — daily completion intensity</p>
       
       <div className="overflow-x-auto">
         <div className="min-w-max">
@@ -55,7 +55,7 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
               return (
                 <div key={col} className="w-4 mr-1 text-center">
                   {pos && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                    <span className="text-xs text-zinc-400 dark:text-zinc-500 whitespace-nowrap">
                       {pos.label}
                     </span>
                   )}
@@ -70,7 +70,7 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
             <div className="flex flex-col gap-1 mr-2">
               {DAY_LABELS.map((label, i) => (
                 <div key={i} className="h-4 flex items-center">
-                  <span className="text-xs text-gray-400 dark:text-gray-500 w-6 text-right leading-none">{label}</span>
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500 w-6 text-right leading-none">{label}</span>
                 </div>
               ))}
             </div>
@@ -80,7 +80,7 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
               <div key={wi} className="flex flex-col gap-1">
                 {week.map((day, di) => {
                   if (!day || day > today) {
-                    return <div key={di} className="w-4 h-4 rounded-sm bg-gray-50 dark:bg-gray-800/30 opacity-0" />;
+                    return <div key={di} className="w-4 h-4 rounded-sm bg-white dark:bg-zinc-800/30 opacity-0" />;
                   }
                   const value = heatmapData[day] ?? -1;
                   const isTodayCell = day === today;
@@ -89,7 +89,7 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
                       key={di}
                       title={getTooltipText(day, value)}
                       className={`w-4 h-4 rounded-sm cursor-default transition-all hover:scale-125 hover:z-10 relative ${
-                        isTodayCell ? 'ring-2 ring-violet-500 ring-offset-1 ring-offset-white dark:ring-offset-gray-900' : ''
+                        isTodayCell ? 'ring-2 ring-yellow-500 ring-offset-1 ring-offset-white dark:ring-offset-zinc-900' : ''
                       }`}
                       style={
                         value > 0
@@ -107,7 +107,7 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
 
       {/* Legend */}
       <div className="flex items-center gap-2 mt-4 justify-end">
-        <span className="text-xs text-gray-400 dark:text-gray-500">Less</span>
+        <span className="text-xs text-zinc-400 dark:text-zinc-500">Less</span>
         {[0, 0.25, 0.5, 0.75, 1].map((v, i) => (
           <div
             key={i}
@@ -118,7 +118,7 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
             }
           />
         ))}
-        <span className="text-xs text-gray-400 dark:text-gray-500">More</span>
+        <span className="text-xs text-zinc-400 dark:text-zinc-500">More</span>
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ interface HabitBreakdownProps {
 const MiniTrendTooltip: React.FC<{ active?: boolean; payload?: { value: number }[] }> = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-gray-800 text-white text-xs rounded px-2 py-1">
+      <div className="bg-zinc-800 text-white text-xs rounded px-2 py-1">
         {payload[0].value}%
       </div>
     );
@@ -36,8 +36,8 @@ const HabitBreakdown: React.FC<HabitBreakdownProps> = ({
 }) => {
   if (habits.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
-        <p className="text-gray-400 dark:text-gray-500">No habits to show yet</p>
+      <div className="bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900 p-8 text-center">
+        <p className="text-zinc-400 dark:text-zinc-500">No habits to show yet</p>
       </div>
     );
   }
@@ -50,13 +50,13 @@ const HabitBreakdown: React.FC<HabitBreakdownProps> = ({
   })).sort((a, b) => b.rate - a.rate);
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Per-Habit Breakdown</h3>
+    <div className="bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900 p-6">
+      <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-6">Per-Habit Breakdown</h3>
       <div className="space-y-4">
         {habitsWithStats.map(({ habit, streak, rate, trend }) => (
           <div
             key={habit.id}
-            className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           >
             {/* Emoji + Name */}
             <div
@@ -66,10 +66,10 @@ const HabitBreakdown: React.FC<HabitBreakdownProps> = ({
               {habit.emoji}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">{habit.name}</p>
+              <p className="font-semibold text-zinc-900 dark:text-white text-sm truncate">{habit.name}</p>
               {/* Progress bar */}
               <div className="flex items-center gap-2 mt-1.5">
-                <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-700"
                     style={{ width: `${rate}%`, backgroundColor: habit.color }}
@@ -86,16 +86,16 @@ const HabitBreakdown: React.FC<HabitBreakdownProps> = ({
               <div className="text-center">
                 <div className="flex items-center gap-1 justify-center">
                   <Flame className="w-3 h-3 text-orange-500" />
-                  <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{streak.current}</span>
+                  <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{streak.current}</span>
                 </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500">streak</p>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">streak</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center gap-1 justify-center">
                   <Trophy className="w-3 h-3 text-amber-500" />
-                  <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{streak.longest}</span>
+                  <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{streak.longest}</span>
                 </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500">best</p>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">best</p>
               </div>
             </div>
 
@@ -119,7 +119,7 @@ const HabitBreakdown: React.FC<HabitBreakdownProps> = ({
             {/* Mobile streak */}
             <div className="sm:hidden flex items-center gap-1">
               <Flame className="w-3.5 h-3.5 text-orange-500" />
-              <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{streak.current}</span>
+              <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{streak.current}</span>
             </div>
           </div>
         ))}

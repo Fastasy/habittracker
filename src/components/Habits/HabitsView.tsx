@@ -55,14 +55,14 @@ const HabitsView: React.FC<HabitsViewProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Habits</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">My Habits</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-1">
             {habits.length === 0 ? 'No habits yet' : `${habits.length} habit${habits.length !== 1 ? 's' : ''} tracked`}
           </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
         >
           <Plus className="w-5 h-5" />
           <span className="hidden sm:block">New Habit</span>
@@ -72,16 +72,16 @@ const HabitsView: React.FC<HabitsViewProps> = ({
       {/* Empty state */}
       {habits.length === 0 && (
         <div className="text-center py-20">
-          <div className="w-20 h-20 rounded-2xl bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center mx-auto mb-6">
-            <Sparkles className="w-10 h-10 text-violet-400" />
+          <div className="w-20 h-20 rounded-2xl bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center mx-auto mb-6">
+            <Sparkles className="w-10 h-10 text-yellow-400" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Start Your Journey</h3>
-          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-8 leading-relaxed">
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Start Your Journey</h3>
+          <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-8 leading-relaxed">
             Build the habits that will transform your life. Small steps, consistently taken, lead to extraordinary results.
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
           >
             <Plus className="w-5 h-5" />
             Create Your First Habit
@@ -106,12 +106,12 @@ const HabitsView: React.FC<HabitsViewProps> = ({
           {/* Add button card */}
           <button
             onClick={() => setShowModal(true)}
-            className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 p-5 flex flex-col items-center justify-center gap-3 hover:border-violet-400 dark:hover:border-violet-600 hover:bg-violet-50/50 dark:hover:bg-violet-900/10 transition-all min-h-[200px] group"
+            className="bg-white dark:bg-zinc-800/50 rounded-2xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 p-5 flex flex-col items-center justify-center gap-3 hover:border-yellow-400 dark:hover:border-yellow-600 hover:bg-yellow-50/50 dark:hover:bg-yellow-900/10 transition-all min-h-[200px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center group-hover:bg-violet-100 dark:group-hover:bg-violet-900/30 transition-colors">
-              <Plus className="w-6 h-6 text-gray-400 group-hover:text-violet-500 transition-colors" />
+            <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center group-hover:bg-yellow-100 dark:group-hover:bg-yellow-900/30 transition-colors">
+              <Plus className="w-6 h-6 text-zinc-400 group-hover:text-yellow-500 transition-colors" />
             </div>
-            <span className="text-sm font-medium text-gray-400 group-hover:text-violet-500 transition-colors">Add Habit</span>
+            <span className="text-sm font-medium text-zinc-400 group-hover:text-yellow-500 transition-colors">Add Habit</span>
           </button>
         </div>
       )}
