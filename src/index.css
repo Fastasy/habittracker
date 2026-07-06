@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/* Dark mode via class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* CSS Variables for theming */
+:root {
+  --heatmap-empty: #e5e7eb;
+}
+
+.dark {
+  --heatmap-empty: #1f2937;
+}
+
+/* Smooth scrollbar hide */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area padding for mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Heatmap intensity classes handled via inline style */
+.intensity-1 { opacity: 0.35; }
+.intensity-2 { opacity: 0.55; }
+.intensity-3 { opacity: 0.75; }
+.intensity-4 { opacity: 1; }
+
+/* Custom animations */
+@keyframes check-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+@keyframes particle-pop {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+  100% { transform: translate(var(--tx, 0), var(--ty, 0)) scale(0); opacity: 0; }
+}
+
+@keyframes confetti-drop {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(20px) rotate(180deg); opacity: 0; }
+}
+
+/* Recharts dark mode fix */
+.recharts-cartesian-grid line {
+  stroke: currentColor;
+  opacity: 0.08;
+}
+
+/* Transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
