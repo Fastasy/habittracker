@@ -36,6 +36,7 @@ export const useHabits = () => {
           timesPerWeek: h.times_per_week,
           specificDays: h.specific_days,
           color: h.color,
+          isBad: h.is_bad,
           emoji: h.icon,
           createdAt: new Date(h.created_at).toISOString().split('T')[0]
         }));
@@ -75,6 +76,7 @@ export const useHabits = () => {
       times_per_week: habit.timesPerWeek,
       specific_days: habit.specificDays,
       color: habit.color,
+      is_bad: habit.isBad ?? false,
       icon: habit.emoji,
       created_at: createdAt
     }).then(res => { if (res.error) console.error(res.error); });
@@ -94,6 +96,7 @@ export const useHabits = () => {
     if (updates.timesPerWeek !== undefined) dbUpdates.times_per_week = updates.timesPerWeek;
     if (updates.specificDays !== undefined) dbUpdates.specific_days = updates.specificDays;
     if (updates.color !== undefined) dbUpdates.color = updates.color;
+    if (updates.isBad !== undefined) dbUpdates.is_bad = updates.isBad;
     if (updates.emoji !== undefined) dbUpdates.icon = updates.emoji;
 
     supabase.from('habits').update(dbUpdates).eq('id', id)

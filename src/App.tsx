@@ -7,6 +7,7 @@ import MobileNav from './components/Layout/MobileNav';
 import TodayView from './components/Today/TodayView';
 import HabitsView from './components/Habits/HabitsView';
 import AnalyticsView from './components/Analytics/AnalyticsView';
+import SettingsView from './components/Settings/SettingsView';
 
 const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('today');
@@ -74,6 +75,7 @@ const AppContent: React.FC = () => {
               getHabitMiniTrend={getHabitMiniTrend}
             />
           )}
+          {currentView === 'settings' && <SettingsView />}
         </div>
       </main>
     </div>

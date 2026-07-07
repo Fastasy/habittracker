@@ -111,7 +111,9 @@ const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onTog
           className={`font-semibold transition-all duration-300 truncate ${
             completed
               ? 'text-zinc-400 dark:text-zinc-500 line-through decoration-zinc-300 dark:decoration-zinc-600'
-              : 'text-zinc-900 dark:text-white'
+              : habit.isBad 
+                ? 'text-red-600 dark:text-red-400' 
+                : 'text-zinc-900 dark:text-white'
           }`}
         >
           {habit.name}
@@ -137,7 +139,7 @@ const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onTog
           }}
         >
           <Check className="w-3 h-3" strokeWidth={3} />
-          Done
+          {habit.isBad ? 'Avoided' : 'Done'}
         </div>
       )}
 

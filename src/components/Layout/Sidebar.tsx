@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ListChecks, BarChart3, Moon, Sun, Sparkles } from 'lucide-react';
+import { CheckCircle2, ListChecks, BarChart3, Moon, Sun, Sparkles, Settings } from 'lucide-react';
 import { ViewType } from '../../types/habit';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -13,6 +13,7 @@ const navItems = [
   { id: 'today' as ViewType, label: 'Today', icon: CheckCircle2 },
   { id: 'habits' as ViewType, label: 'My Habits', icon: ListChecks },
   { id: 'analytics' as ViewType, label: 'Analytics', icon: BarChart3 },
+  { id: 'settings' as ViewType, label: 'Settings', icon: Settings },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, habitCount }) => {

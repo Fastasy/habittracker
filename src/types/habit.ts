@@ -5,6 +5,7 @@ export interface Habit {
   name: string;
   emoji: string;
   color: string;
+  isBad?: boolean;
   frequency: FrequencyType;
   specificDays?: number[]; // 0=Sun, 1=Mon, ..., 6=Sat
   timesPerWeek?: number;
@@ -29,6 +30,6 @@ export interface StreakInfo {
   longest: number;
 }
 
-export type ViewType = 'today' | 'habits' | 'analytics';
+export type ViewType = 'today' | 'habits' | 'analytics' | 'settings';
 
 export type DateRangeFilter = '7d' | '30d' | 'all';

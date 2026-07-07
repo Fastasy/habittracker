@@ -39,6 +39,7 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
   const [frequency, setFrequency] = useState<FrequencyType>(habit?.frequency ?? 'daily');
   const [specificDays, setSpecificDays] = useState<number[]>(habit?.specificDays ?? [1, 2, 3, 4, 5]);
   const [timesPerWeek, setTimesPerWeek] = useState(habit?.timesPerWeek ?? 3);
+  const [isBad, setIsBad] = useState(habit?.isBad ?? false);
   const [nameError, setNameError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,6 +59,7 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
       frequency,
       specificDays: frequency === 'specific_days' ? specificDays : undefined,
       timesPerWeek: frequency === 'times_per_week' ? timesPerWeek : undefined,
+      isBad,
     });
   };
 
@@ -98,6 +100,37 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
               className="w-full px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all"
             />
             {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
+          </div>
+
+          {/* Habit Type */}
+          <div>
+            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+              Type
+            </label>
+            <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl">
+              <button
+                type="button"
+                onClick={() => setIsBad(false)}
+                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  !isBad
+                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm'
+                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
+                }`}
+              >
+                Good Habit
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsBad(true)}
+                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  isBad
+                    ? 'bg-white dark:bg-zinc-700 text-red-600 dark:text-red-400 shadow-sm'
+                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
+                }`}
+              >
+                Bad Habit
+              </button>
+            </div>
           </div>
 
           {/* Emoji */}
