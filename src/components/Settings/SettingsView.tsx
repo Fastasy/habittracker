@@ -74,10 +74,10 @@ const SettingsView: React.FC = () => {
         throw new Error('Notification permission denied.');
       }
 
-      let registration = await navigator.serviceWorker.getRegistration();
-      if (!registration) {
-        registration = await navigator.serviceWorker.register('/sw.js');
-      }
+      let registration = await navigator.serviceWorker.register('/sw.js');
+      
+      // Wait until the service worker is fully active before subscribing
+      registration = await navigator.serviceWorker.ready;
 
       const publicVapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
       if (!publicVapidKey) throw new Error('VAPID public key is missing from environment variables.');
