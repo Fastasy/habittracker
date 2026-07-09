@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ListChecks, BarChart3, Moon, Sun, Sparkles, Settings } from 'lucide-react';
+import { CheckCircle2, ListChecks, BarChart3, Moon, Sun, Sparkles, Settings, Target, Dumbbell } from 'lucide-react';
 import { ViewType } from '../../types/habit';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -12,6 +12,8 @@ interface SidebarProps {
 const navItems = [
   { id: 'today' as ViewType, label: 'Today', icon: CheckCircle2 },
   { id: 'habits' as ViewType, label: 'My Habits', icon: ListChecks },
+  { id: 'goals' as ViewType, label: 'My Goals', icon: Target },
+  { id: 'fitness' as ViewType, label: 'Fitness', icon: Dumbbell },
   { id: 'analytics' as ViewType, label: 'Analytics', icon: BarChart3 },
   { id: 'settings' as ViewType, label: 'Settings', icon: Settings },
 ];

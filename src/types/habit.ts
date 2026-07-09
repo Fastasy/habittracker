@@ -1,5 +1,15 @@
 export type FrequencyType = 'daily' | 'specific_days' | 'times_per_week';
 
+export interface Goal {
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  deadline?: string;
+  targetWeight?: number;
+  createdAt: string;
+}
+
 export interface Habit {
   id: string;
   name: string;
@@ -11,6 +21,7 @@ export interface Habit {
   timesPerWeek?: number;
   createdAt: string; // ISO date string
   archivedAt?: string;
+  goalId?: string;
 }
 
 export interface HabitLog {
@@ -30,6 +41,6 @@ export interface StreakInfo {
   longest: number;
 }
 
-export type ViewType = 'today' | 'habits' | 'analytics' | 'settings';
+export type ViewType = 'today' | 'habits' | 'analytics' | 'settings' | 'goals' | 'fitness';
 
 export type DateRangeFilter = '7d' | '30d' | 'all';

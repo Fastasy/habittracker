@@ -8,9 +8,16 @@ import TodayView from './components/Today/TodayView';
 import HabitsView from './components/Habits/HabitsView';
 import AnalyticsView from './components/Analytics/AnalyticsView';
 import SettingsView from './components/Settings/SettingsView';
+import GoalsView from './components/Goals/GoalsView';
+import FitnessView from './components/Fitness/FitnessView';
+import AuthView from './components/Auth/AuthView';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useGoals } from './hooks/useGoals';
+import { useWeight } from './hooks/useWeight';
 
 const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('today');
+  const { session, isLoading: isAuthLoading } = useAuth();
 
   const {
     habits,
@@ -28,7 +35,30 @@ const AppContent: React.FC = () => {
     getHeatmapData,
     getLongestActiveStreak,
     getHabitMiniTrend,
+    setHabitGoal,
   } = useHabits();
+
+  const { goals, addGoal, updateGoal, deleteGoal } = useGoals();
+  const { logWeight, getWeightLog, getWeightLogs, logs: weightLogs } = useWeight();
+
+  // Compute latest weight for GoalsView
+  const latestWeight = React.useMemo(() => {
+    if (weightLogs.length === 0) return undefined;
+    const sorted = [...weightLogs].sort((a, b) => b.date.localeCompare(a.date));
+    return sorted[0].weight;
+  }, [weightLogs]);
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <AuthView />;
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white transition-colors duration-300">
@@ -61,6 +91,25 @@ const AppContent: React.FC = () => {
               getHabitMiniTrend={getHabitMiniTrend}
             />
           )}
+          {currentView === 'goals' && (
+            <GoalsView
+              goals={goals}
+              habits={habits}
+              onAddGoal={addGoal}
+              onUpdateGoal={updateGoal}
+              onDeleteGoal={deleteGoal}
+              setHabitGoal={setHabitGoal}
+              getCompletionRate={getCompletionRate}
+              latestWeight={latestWeight}
+            />
+          )}
+          {currentView === 'fitness' && (
+            <FitnessView
+              getWeightLog={getWeightLog}
+              logWeight={logWeight}
+              getWeightLogs={getWeightLogs}
+            />
+          )}
           {currentView === 'analytics' && (
             <AnalyticsView
               habits={habits}
@@ -82,10 +131,14 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC = () => (
-  <ThemeProvider>
-    <AppContent />
-  </ThemeProvider>
-);
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
+  );
+};
 
 export default App;

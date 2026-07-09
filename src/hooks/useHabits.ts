@@ -38,7 +38,8 @@ export const useHabits = () => {
           color: h.color,
           isBad: h.is_bad,
           emoji: h.icon,
-          createdAt: new Date(h.created_at).toISOString().split('T')[0]
+          createdAt: new Date(h.created_at).toISOString().split('T')[0],
+          goalId: h.goal_id
         }));
 
         const logs = logsRes.data.map(l => ({
@@ -109,6 +110,16 @@ export const useHabits = () => {
       logs: prev.logs.filter(l => l.habitId !== id),
     }));
     supabase.from('habits').delete().eq('id', id)
+      .then(res => { if (res.error) console.error(res.error); });
+  }, []);
+
+  const setHabitGoal = useCallback((habitId: string, goalId?: string) => {
+    setStore(prev => ({
+      ...prev,
+      habits: prev.habits.map(h => h.id === habitId ? { ...h, goalId } : h)
+    }));
+    
+    supabase.from('habits').update({ goal_id: goalId || null }).eq('id', habitId)
       .then(res => { if (res.error) console.error(res.error); });
   }, []);
 
@@ -410,5 +421,6 @@ export const useHabits = () => {
     getHeatmapData,
     getLongestActiveStreak,
     getHabitMiniTrend,
+    setHabitGoal,
   };
 };

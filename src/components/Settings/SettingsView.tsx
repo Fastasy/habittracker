@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabase';
-import { Bell, Save, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Bell, Save, CheckCircle2, AlertCircle, LogOut } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Reminder {
   id: string;
@@ -14,6 +15,7 @@ const SettingsView: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [pushEnabled, setPushEnabled] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const { signOut, user } = useAuth();
 
   useEffect(() => {
     fetchReminders();
@@ -225,6 +227,29 @@ const SettingsView: React.FC = () => {
               )}
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Account Section */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-red-200 dark:border-red-900/30 shadow-sm mt-8">
+        <div className="flex items-start justify-between">
+          <div className="flex gap-4">
+            <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+              <LogOut className="w-6 h-6 text-red-600 dark:text-red-500" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Sign Out</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm">
+                Signed in as <span className="font-medium text-zinc-700 dark:text-zinc-300">{user?.email}</span>
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={signOut}
+            className="px-4 py-2 rounded-lg font-semibold bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 transition-all border border-red-200 dark:border-red-800/50"
+          >
+            Sign Out
+          </button>
         </div>
       </div>
     </div>
