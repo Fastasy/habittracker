@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../utils/supabase';
 import { Habit, HabitStore, StreakInfo } from '../types/habit';
+import { useHabitExtensions } from './useHabitExtensions';
 import {
   today,
   toDateString,
@@ -17,6 +18,7 @@ import {
 export const useHabits = () => {
   const [store, setStore] = useState<HabitStore>({ habits: [], logs: [] });
   const [isLoading, setIsLoading] = useState(true);
+  const { extensions, setExtension, deleteExtension } = useHabitExtensions();
 
   useEffect(() => {
     const loadData = async () => {
@@ -60,6 +62,14 @@ export const useHabits = () => {
     loadData();
   }, []);
 
+  const mergedHabits = useMemo(() => {
+    return store.habits.map(h => ({
+      ...h,
+      pillarId: extensions[h.id]?.pillarId,
+      value: extensions[h.id]?.value,
+    }));
+  }, [store.habits, extensions]);
+
   const addHabit = useCallback((habit: Omit<Habit, 'id' | 'createdAt'>) => {
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
@@ -70,6 +80,9 @@ export const useHabits = () => {
     };
     setStore(prev => ({ ...prev, habits: [...prev.habits, newHabit] }));
     
+    // Save extensions locally
+    setExtension(id, { pillarId: habit.pillarId, value: habit.value });
+
     supabase.from('habits').insert({
       id,
       name: habit.name,
@@ -83,7 +96,7 @@ export const useHabits = () => {
     }).then(res => { if (res.error) console.error(res.error); });
 
     return newHabit;
-  }, []);
+  }, [setExtension]);
 
   const updateHabit = useCallback((id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt'>>) => {
     setStore(prev => ({
@@ -91,6 +104,10 @@ export const useHabits = () => {
       habits: prev.habits.map(h => (h.id === id ? { ...h, ...updates } : h)),
     }));
     
+    if (updates.pillarId !== undefined || updates.value !== undefined) {
+      setExtension(id, { pillarId: updates.pillarId, value: updates.value });
+    }
+
     const dbUpdates: any = {};
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.frequency !== undefined) dbUpdates.frequency = updates.frequency;
@@ -100,18 +117,21 @@ export const useHabits = () => {
     if (updates.isBad !== undefined) dbUpdates.is_bad = updates.isBad;
     if (updates.emoji !== undefined) dbUpdates.icon = updates.emoji;
 
-    supabase.from('habits').update(dbUpdates).eq('id', id)
-      .then(res => { if (res.error) console.error(res.error); });
-  }, []);
+    if (Object.keys(dbUpdates).length > 0) {
+      supabase.from('habits').update(dbUpdates).eq('id', id)
+        .then(res => { if (res.error) console.error(res.error); });
+    }
+  }, [setExtension]);
 
   const deleteHabit = useCallback((id: string) => {
     setStore(prev => ({
       habits: prev.habits.filter(h => h.id !== id),
       logs: prev.logs.filter(l => l.habitId !== id),
     }));
+    deleteExtension(id);
     supabase.from('habits').delete().eq('id', id)
       .then(res => { if (res.error) console.error(res.error); });
-  }, []);
+  }, [deleteExtension]);
 
   const setHabitGoal = useCallback((habitId: string, goalId?: string) => {
     setStore(prev => ({
@@ -162,27 +182,30 @@ export const useHabits = () => {
   );
 
   const getStreak = useCallback(
-    (habitId: string): StreakInfo => {
+    (habitId: string, asOfDateStr?: string): StreakInfo => {
       const habit = store.habits.find(h => h.id === habitId);
       if (!habit) return { current: 0, longest: 0 };
 
-      const todayStr = today();
+      const targetDate = asOfDateStr || today();
       const allDays = getLast365Days().filter(d => isHabitScheduledForDate(habit, d));
+      // Only consider days up to targetDate
+      const scheduledDays = allDays.filter(d => d <= targetDate);
 
       // For times_per_week, we need special handling
       if (habit.frequency === 'times_per_week') {
+        if (scheduledDays.length === 0) return { current: 0, longest: 0 };
         const timesNeeded = habit.timesPerWeek ?? 1;
         // Build weeks and check if target met
         const weeks: string[][] = [];
-        const start = parseISO(allDays[0]);
-        const end = parseISO(allDays[allDays.length - 1]);
+        const start = parseISO(scheduledDays[0]);
+        const end = parseISO(targetDate);
         let weekStart = start;
         while (!isBefore(end, weekStart)) {
           const weekEnd = addDays(weekStart, 6);
           const weekDays: string[] = [];
           eachDayOfInterval({ start: weekStart, end: weekEnd }).forEach(d => {
             const ds = toDateString(d);
-            if (allDays.includes(ds)) weekDays.push(ds);
+            if (scheduledDays.includes(ds)) weekDays.push(ds);
           });
           if (weekDays.length > 0) weeks.push(weekDays);
           weekStart = addDays(weekStart, 7);
@@ -219,40 +242,48 @@ export const useHabits = () => {
         store.logs.filter(l => l.habitId === habitId && l.completed).map(l => l.date)
       );
 
-      const scheduledDays = allDays.filter(d => d <= todayStr);
-
       let currentStreak = 0;
       let longestStreak = 0;
       let tempStreak = 0;
 
       // Check if today or yesterday is completed (grace period)
-      const todayScheduled = scheduledDays.includes(todayStr);
+      const targetScheduled = scheduledDays.includes(targetDate);
       const startIdx = scheduledDays.length - 1;
 
       // Build streak from today backwards
       let activeStreak = 0;
+      let missedDays = 0;
       for (let i = startIdx; i >= 0; i--) {
         const d = scheduledDays[i];
         if (completedDays.has(d)) {
           activeStreak++;
+          missedDays = 0; // Reset missed days if completed
         } else {
-          // If today isn't done yet, don't break streak
-          if (i === startIdx && todayScheduled && !completedDays.has(todayStr)) {
+          // If targetDate isn't done yet, don't count it as a missed day yet for the purpose of breaking the streak
+          if (i === startIdx && targetScheduled && !completedDays.has(targetDate)) {
             continue;
           }
-          break;
+          missedDays++;
+          if (missedDays >= 2) {
+            break;
+          }
         }
       }
       currentStreak = activeStreak;
 
       // Calculate longest streak
       tempStreak = 0;
+      let tempMissed = 0;
       for (const d of scheduledDays) {
         if (completedDays.has(d)) {
           tempStreak++;
+          tempMissed = 0;
           longestStreak = Math.max(longestStreak, tempStreak);
         } else {
-          tempStreak = 0;
+          tempMissed++;
+          if (tempMissed >= 2) {
+            tempStreak = 0;
+          }
         }
       }
 
@@ -403,7 +434,7 @@ export const useHabits = () => {
   );
 
   return {
-    habits: store.habits,
+    habits: mergedHabits,
     logs: store.logs,
     isLoading,
     addHabit,

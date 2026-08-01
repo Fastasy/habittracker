@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Pencil, Trash2, Flame, Trophy, TrendingUp, MoreVertical } from 'lucide-react';
 import { Habit, StreakInfo } from '../../types/habit';
 import { emojiToIcon } from '../../utils/iconMap';
+import InfoTooltip from '../InfoTooltip';
 
 interface HabitCardProps {
   habit: Habit;
@@ -65,10 +66,30 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, streak, completionRate, mi
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  // Thermodynamic "Streak Heat" Logic
+  const currentStreak = streak.current;
+  let heatClasses = 'border-zinc-200 dark:border-zinc-800/80';
+  let isBlazing = false;
+
+  if (currentStreak >= 7) {
+    isBlazing = true;
+    heatClasses = 'border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.25)] relative';
+  } else if (currentStreak >= 3) {
+    heatClasses = 'border-zinc-300 dark:border-zinc-600 shadow-[0_0_10px_rgba(255,255,255,0.05)]';
+  }
+
   return (
-    <div className="bg-zinc-50 dark:bg-zinc-900/40 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 p-4 hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all duration-200 relative group flex flex-col gap-4">
+    <div className={`bg-zinc-50 dark:bg-zinc-900/40 backdrop-blur-md rounded-xl border p-4 transition-all duration-200 group flex flex-col gap-4 ${heatClasses}`}>
+      
+      {isBlazing && (
+        <div className="absolute top-0 left-0 w-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-bold uppercase tracking-widest text-center py-0.5 flex items-center justify-center gap-2 rounded-t-xl">
+          <span>🔥 Blazing Streak • Compounding at +5% Daily</span>
+          <InfoTooltip text="Blazing streaks (7+ days) trigger the 5% daily compounding multiplier on your Discipline Net Worth." />
+        </div>
+      )}
+
       {/* Header Row */}
-      <div className="flex items-center justify-between">
+      <div className={`flex items-center justify-between ${isBlazing ? 'mt-3' : ''}`}>
         <div className="flex items-center gap-3">
           <div
             className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"

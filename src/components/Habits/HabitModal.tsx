@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Check } from 'lucide-react';
 import { Habit, FrequencyType } from '../../types/habit';
 import { emojiToIcon } from '../../utils/iconMap';
+import { useSettings } from '../../hooks/useSettings';
 
 const EMOJI_OPTIONS = [
   '🏃', '💪', '📚', '🧘', '💧', '🥗', '😴', '🎯', '✍️', '🎵',
@@ -34,6 +35,8 @@ interface HabitModalProps {
 }
 
 const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
+  const { pillars, valueConfig } = useSettings();
+
   const [name, setName] = useState(habit?.name ?? '');
   const [emoji, setEmoji] = useState(habit?.emoji ?? '🎯');
   const [color, setColor] = useState(habit?.color ?? '#10b981');
@@ -41,6 +44,9 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
   const [specificDays, setSpecificDays] = useState<number[]>(habit?.specificDays ?? [1, 2, 3, 4, 5]);
   const [timesPerWeek, setTimesPerWeek] = useState(habit?.timesPerWeek ?? 3);
   const [isBad, setIsBad] = useState(habit?.isBad ?? false);
+  const [pillarId, setPillarId] = useState<string>(habit?.pillarId ?? (pillars.length > 0 ? pillars[0].id : ''));
+  const [value, setValue] = useState<number | undefined>(habit?.value);
+  
   const [nameError, setNameError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,6 +59,10 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
       setNameError('Please select at least one day');
       return;
     }
+    if (pillars.length > 0 && !pillarId) {
+      setNameError('Please select a pillar');
+      return;
+    }
     onSave({
       name: name.trim(),
       emoji,
@@ -61,6 +71,8 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
       specificDays: frequency === 'specific_days' ? specificDays : undefined,
       timesPerWeek: frequency === 'times_per_week' ? timesPerWeek : undefined,
       isBad,
+      pillarId: pillars.length > 0 ? pillarId : undefined,
+      value: valueConfig.active ? value : undefined,
     });
   };
 
@@ -102,6 +114,42 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
             />
             {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
           </div>
+
+          {/* Pillar Mapping */}
+          {pillars.length > 0 && (
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
+                Pillar Mapping
+              </label>
+              <select
+                value={pillarId}
+                onChange={e => setPillarId(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+              >
+                <option value="" disabled>Select a Pillar</option>
+                {pillars.map(p => (
+                  <option key={p.id} value={p.id}>{p.icon} {p.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Value Tracking */}
+          {valueConfig.active && (
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
+                Value Assignment ({valueConfig.symbol})
+              </label>
+              <input
+                type="number"
+                value={value ?? ''}
+                onChange={e => setValue(e.target.value ? Number(e.target.value) : undefined)}
+                placeholder={`Value (+/- ${valueConfig.symbol})`}
+                className="w-full px-3 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+              />
+              <p className="text-[10px] text-zinc-500 mt-1">Assign positive or negative {valueConfig.symbol} for completing this routine.</p>
+            </div>
+          )}
 
           {/* Habit Type */}
           <div>

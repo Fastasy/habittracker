@@ -22,6 +22,8 @@ export interface Habit {
   createdAt: string; // ISO date string
   archivedAt?: string;
   goalId?: string;
+  pillarId?: string;
+  value?: number;
 }
 
 export interface HabitLog {

@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { format, parseISO } from 'date-fns';
-import { getLast180Days, getWeeksForHeatmap, toDateString } from '../../utils/dateUtils';
+import { getLast365Days, getWeeksForHeatmap, toDateString } from '../../utils/dateUtils';
 import { Activity } from 'lucide-react';
+import InfoTooltip from '../InfoTooltip';
 
 interface HeatmapCalendarProps {
   heatmapData: Record<string, number>;
@@ -20,7 +21,7 @@ const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
 const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
   const today = toDateString(new Date());
-  const days = useMemo(() => getLast180Days(), []);
+  const days = useMemo(() => getLast365Days(), []);
   const weeks = useMemo(() => getWeeksForHeatmap(days), [days]);
 
   // Month labels: find first week of each month
@@ -52,7 +53,8 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
     <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
       <div className="flex items-center gap-2 mb-6 border-b border-zinc-200 dark:border-zinc-800/80 pb-4">
         <Activity className="w-4 h-4 text-emerald-500" />
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">6-Month Activity Matrix</h3>
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">12-Month Activity Matrix</h3>
+        <InfoTooltip text="Visual representation of your daily habit completion rate over the last 12 months." />
       </div>
       
       <div className="overflow-x-auto scrollbar-hide">

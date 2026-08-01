@@ -59,7 +59,7 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   }, [dateFilter, getWeeklyCompletionData]);
 
   const weekdayData = useMemo(() => getWeekdayStats(filterDays), [filterDays, getWeekdayStats]);
-  const heatmapData = useMemo(() => getHeatmapData(getLastNDays(180)), [getHeatmapData]);
+  const heatmapData = useMemo(() => getHeatmapData(getLastNDays(365)), [getHeatmapData]);
 
   if (habits.length === 0) {
     return (
