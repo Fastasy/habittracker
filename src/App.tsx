@@ -48,17 +48,17 @@ const AppContent: React.FC = () => {
     return sorted[0].weight;
   }, [weightLogs]);
 
-  /* if (isAuthLoading) {
+  if (isAuthLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   if (!session) {
     return <AuthView />;
-  } */
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white transition-colors duration-300">
