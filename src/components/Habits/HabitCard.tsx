@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Pencil, Trash2, Flame, Trophy, TrendingUp, MoreVertical } from 'lucide-react';
 import { Habit, StreakInfo } from '../../types/habit';
+import { emojiToIcon } from '../../utils/iconMap';
 
 interface HabitCardProps {
   habit: Habit;
@@ -18,10 +19,10 @@ const FrequencyBadge: React.FC<{ habit: Habit }> = ({ habit }) => {
   else if (habit.frequency === 'specific_days') {
     text = (habit.specificDays ?? []).map(d => DAY_LABELS[d]).join(', ');
   } else {
-    text = `${habit.timesPerWeek}× per week`;
+    text = `${habit.timesPerWeek}× / week`;
   }
   return (
-    <span className="text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+    <span className="text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 bg-transparent border border-zinc-200 dark:border-zinc-800 px-2 py-0.5 rounded-full">
       {text}
     </span>
   );
@@ -30,7 +31,7 @@ const FrequencyBadge: React.FC<{ habit: Habit }> = ({ habit }) => {
 const MiniSparkline: React.FC<{ data: { week: number; rate: number }[]; color: string }> = ({ data, color }) => {
   const max = 100;
   const width = 80;
-  const height = 28;
+  const height = 24;
   const padding = 2;
   const points = data.map((d, i) => {
     const x = padding + (i / (data.length - 1)) * (width - padding * 2);
@@ -44,16 +45,16 @@ const MiniSparkline: React.FC<{ data: { week: number; rate: number }[]; color: s
         points={points}
         fill="none"
         stroke={color}
-        strokeWidth="2"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity="0.8"
+        opacity="0.7"
       />
       {data.map((d, i) => {
         const x = padding + (i / (data.length - 1)) * (width - padding * 2);
         const y = height - padding - (d.rate / max) * (height - padding * 2);
         return i === data.length - 1 ? (
-          <circle key={i} cx={x} cy={y} r="3" fill={color} />
+          <circle key={i} cx={x} cy={y} r="2.5" fill={color} />
         ) : null;
       })}
     </svg>
@@ -65,19 +66,21 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, streak, completionRate, mi
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900 p-5 hover:shadow-md dark:hover:shadow-zinc-900/50 transition-all duration-200 relative group">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+    <div className="bg-zinc-50 dark:bg-zinc-900/40 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 p-4 hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all duration-200 relative group flex flex-col gap-4">
+      {/* Header Row */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm flex-shrink-0"
-            style={{ backgroundColor: habit.color + '18', border: `2px solid ${habit.color}30` }}
+            className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: habit.color + '15', color: habit.color }}
           >
-            {habit.emoji}
+            {emojiToIcon(habit.emoji, "w-5 h-5")}
           </div>
           <div>
-            <h3 className="font-bold text-zinc-900 dark:text-white leading-tight">{habit.name}</h3>
-            <FrequencyBadge habit={habit} />
+            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide text-sm">{habit.name}</h3>
+            <div className="mt-1">
+              <FrequencyBadge habit={habit} />
+            </div>
           </div>
         </div>
 
@@ -85,21 +88,21 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, streak, completionRate, mi
         <div className="relative">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors opacity-0 group-hover:opacity-100"
+            className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-200/50 dark:hover:bg-zinc-800 transition-colors opacity-0 group-hover:opacity-100"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
           {menuOpen && (
-            <div className="absolute right-0 top-8 w-36 bg-white dark:bg-zinc-800 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-700 z-10 overflow-hidden">
+            <div className="absolute right-0 top-8 w-36 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-800 z-10 overflow-hidden">
               <button
                 onClick={() => { setMenuOpen(false); onEdit(); }}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-700 transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
               >
                 <Pencil className="w-3.5 h-3.5" /> Edit
               </button>
               <button
                 onClick={() => { setMenuOpen(false); setConfirmDelete(true); }}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" /> Delete
               </button>
@@ -108,59 +111,56 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, streak, completionRate, mi
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-white dark:bg-zinc-800 rounded-xl p-3 text-center">
-          <div className="flex items-center justify-center gap-1 mb-1">
-            <Flame className="w-3.5 h-3.5" style={{ color: habit.color }} />
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Streak</span>
+      {/* Stats Row */}
+      <div className="grid grid-cols-4 gap-2 items-center">
+        <div className="col-span-3 grid grid-cols-3 gap-2">
+          <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2 text-center">
+            <div className="flex items-center justify-center gap-1 mb-0.5">
+              <Flame className="w-3 h-3" style={{ color: habit.color }} />
+              <span className="text-[9px] uppercase tracking-widest text-zinc-500">Streak</span>
+            </div>
+            <p className="text-sm font-semibold" style={{ color: habit.color }}>{streak.current}</p>
           </div>
-          <p className="text-xl font-bold" style={{ color: habit.color }}>{streak.current}</p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">days</p>
-        </div>
-        <div className="bg-white dark:bg-zinc-800 rounded-xl p-3 text-center">
-          <div className="flex items-center justify-center gap-1 mb-1">
-            <Trophy className="w-3.5 h-3.5 text-amber-500" />
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Best</span>
+          <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2 text-center">
+            <div className="flex items-center justify-center gap-1 mb-0.5">
+              <Trophy className="w-3 h-3 text-amber-500" />
+              <span className="text-[9px] uppercase tracking-widest text-zinc-500">Best</span>
+            </div>
+            <p className="text-sm font-semibold text-amber-500">{streak.longest}</p>
           </div>
-          <p className="text-xl font-bold text-amber-500">{streak.longest}</p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">days</p>
-        </div>
-        <div className="bg-white dark:bg-zinc-800 rounded-xl p-3 text-center">
-          <div className="flex items-center justify-center gap-1 mb-1">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Rate</span>
+          <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2 text-center">
+            <div className="flex items-center justify-center gap-1 mb-0.5">
+              <TrendingUp className="w-3 h-3 text-emerald-500" />
+              <span className="text-[9px] uppercase tracking-widest text-zinc-500">Rate</span>
+            </div>
+            <p className="text-sm font-semibold text-emerald-500">{completionRate}%</p>
           </div>
-          <p className="text-xl font-bold text-emerald-500">{completionRate}%</p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">30d</p>
         </div>
-      </div>
-
-      {/* Mini trend sparkline */}
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-zinc-400 dark:text-zinc-500">8-week trend</span>
-        {miniTrend.length > 1 && (
-          <MiniSparkline data={miniTrend} color={habit.color} />
-        )}
+        <div className="col-span-1 flex items-center justify-end">
+          {miniTrend.length > 1 && (
+            <MiniSparkline data={miniTrend} color={habit.color} />
+          )}
+        </div>
       </div>
 
       {/* Delete confirmation */}
       {confirmDelete && (
-        <div className="absolute inset-0 bg-white/95 dark:bg-black/95 rounded-2xl flex flex-col items-center justify-center gap-4 p-6 z-10">
-          <p className="text-center text-sm font-medium text-zinc-800 dark:text-zinc-200">
-            Delete <strong>"{habit.name}"</strong>?<br />
-            <span className="text-zinc-500 dark:text-zinc-400 font-normal">All logs will be lost.</span>
+        <div className="absolute inset-0 bg-zinc-50/95 dark:bg-zinc-950/95 backdrop-blur-sm rounded-xl border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center gap-3 p-4 z-10">
+          <p className="text-center text-xs font-medium text-zinc-800 dark:text-zinc-200">
+            Delete <strong>"{habit.name}"</strong>?
+            <br />
+            <span className="text-zinc-500 font-normal">All logs will be lost.</span>
           </p>
-          <div className="flex gap-3 w-full">
+          <div className="flex gap-2 w-full">
             <button
               onClick={() => setConfirmDelete(false)}
-              className="flex-1 px-4 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 transition-colors"
+              className="flex-1 px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={() => { setConfirmDelete(false); onDelete(); }}
-              className="flex-1 px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors"
+              className="flex-1 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 border border-red-500/20 text-xs font-semibold transition-colors"
             >
               Delete
             </button>

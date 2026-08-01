@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from 'recharts';
 import { format, parseISO } from 'date-fns';
+import { Activity } from 'lucide-react';
 
 interface WeightChartProps {
   data: { date: string; weight: number | null }[];
@@ -20,13 +21,9 @@ const WeightChart: React.FC<WeightChartProps> = ({ data }) => {
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">Weight Trend</h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Your weight logs over time.</p>
-        <div className="flex flex-col items-center justify-center py-10 opacity-50">
-          <span className="text-4xl mb-2">⚖️</span>
-          <p className="text-sm font-medium text-zinc-500">No weight data for this period.</p>
-        </div>
+      <div className="w-full h-full flex flex-col items-center justify-center opacity-50">
+        <Activity className="w-6 h-6 text-zinc-500 mb-2" />
+        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">No telemetry available</p>
       </div>
     );
   }
@@ -37,53 +34,55 @@ const WeightChart: React.FC<WeightChartProps> = ({ data }) => {
   const maxWeight = Math.ceil(Math.max(...weights) + 2);
 
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
-      <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">Weight Trend</h3>
-      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Your weight logs over time.</p>
-      
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-zinc-200 dark:text-zinc-800" />
-            <XAxis 
-              dataKey="label" 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fontSize: 12, fill: '#71717a' }} 
-              dy={10} 
-            />
-            <YAxis 
-              domain={[minWeight, maxWeight]} 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fontSize: 12, fill: '#71717a' }} 
-              tickFormatter={(val) => `${val}kg`}
-            />
-            <Tooltip
-              contentStyle={{ 
-                backgroundColor: 'rgba(24, 24, 27, 0.9)', 
-                border: 'none',
-                borderRadius: '12px',
-                color: '#fff',
-                fontWeight: 500,
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
-              }}
-              itemStyle={{ color: '#fff' }}
-              labelStyle={{ color: '#a1a1aa', marginBottom: '4px' }}
-              formatter={(value: number) => [`${value} kg`, 'Weight']}
-            />
-            <Line
-              type="monotone"
-              dataKey="weight"
-              stroke="#3b82f6" // blue-500
-              strokeWidth={3}
-              dot={{ r: 4, strokeWidth: 2, fill: '#fff', stroke: '#3b82f6' }}
-              activeDot={{ r: 6, strokeWidth: 0, fill: '#3b82f6' }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
+        <defs>
+          <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:[stroke:rgba(63,63,70,0.4)]" />
+        <XAxis 
+          dataKey="label" 
+          axisLine={false} 
+          tickLine={false} 
+          tick={{ fontSize: 10, fill: '#71717a', fontWeight: 600 }} 
+          dy={10} 
+        />
+        <YAxis 
+          domain={[minWeight, maxWeight]} 
+          axisLine={false} 
+          tickLine={false} 
+          tick={{ fontSize: 10, fill: '#71717a', fontWeight: 600 }} 
+          tickFormatter={(val) => `${val}kg`}
+        />
+        <Tooltip
+          contentStyle={{ 
+            backgroundColor: '#09090b', // zinc-950
+            border: '1px solid rgba(63,63,70,0.8)', // zinc-800
+            borderRadius: '8px',
+            color: '#fff',
+            fontWeight: 600,
+            fontSize: '12px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+          }}
+          itemStyle={{ color: '#10b981' }} // emerald-500
+          labelStyle={{ color: '#71717a', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}
+          formatter={(value: number) => [`${value} kg`, 'Weight']}
+          cursor={{ stroke: 'rgba(16,185,129,0.3)', strokeWidth: 1, strokeDasharray: '3 3' }}
+        />
+        <Area
+          type="monotone"
+          dataKey="weight"
+          stroke="#10b981" // emerald-500
+          strokeWidth={2}
+          fill="url(#weightGradient)"
+          dot={{ r: 3, strokeWidth: 2, fill: '#09090b', stroke: '#10b981' }}
+          activeDot={{ r: 5, strokeWidth: 2, fill: '#10b981', stroke: '#09090b' }}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 };
 

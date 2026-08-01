@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ListChecks, BarChart3, Moon, Sun, Sparkles, Settings, Target, Dumbbell } from 'lucide-react';
+import { CheckCircle2, ListChecks, BarChart3, Moon, Sun, Settings, Target, Dumbbell } from 'lucide-react';
 import { ViewType } from '../../types/habit';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -22,41 +22,37 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, habitCount
   const { isDark, toggleDark } = useTheme();
 
   return (
-    <aside className="hidden md:flex flex-col w-64 min-h-screen bg-white dark:bg-black border-r border-zinc-300 dark:border-zinc-900 fixed left-0 top-0 bottom-0 z-20">
-      {/* Logo */}
-      <div className="p-6 border-b border-zinc-200 dark:border-zinc-900">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center shadow-md">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="font-bold text-zinc-900 dark:text-white text-lg leading-none">Streakly</h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Habit Tracker</p>
-          </div>
-        </div>
+    <aside className="hidden md:flex flex-col w-64 h-screen bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-900 fixed left-0 top-0 bottom-0 z-20">
+      {/* Brand Header */}
+      <div className="px-6 py-8 border-b border-zinc-200 dark:border-zinc-900/50">
+        <h1 className="font-semibold text-zinc-900 dark:text-white text-xl tracking-tight leading-none uppercase">Streakly</h1>
+        <p className="text-[9px] font-mono text-zinc-500 tracking-widest mt-2 uppercase">Operating System v1.0</p>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-hide">
         {navItems.map(({ id, label, icon: Icon }) => {
           const isActive = currentView === id;
           return (
             <button
               key={id}
               onClick={() => onViewChange(id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 relative ${
                 isActive
-                  ? 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                  ? 'bg-zinc-100 dark:bg-zinc-900/60 text-zinc-900 dark:text-white font-medium'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 font-light'
               }`}
             >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-yellow-600 dark:text-yellow-400' : ''}`} />
-              {label}
+              {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-emerald-500 rounded-r-full" />
+              )}
+              <Icon className={`w-4 h-4 stroke-[1.5] ${isActive ? 'text-emerald-500' : 'opacity-70'}`} />
+              <span className="tracking-wide">{label}</span>
               {id === 'habits' && habitCount > 0 && (
-                <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${
+                <span className={`ml-auto text-[10px] px-2 py-0.5 rounded-md font-medium border ${
                   isActive
-                    ? 'bg-yellow-100 dark:bg-yellow-800 text-yellow-700 dark:text-yellow-300'
-                    : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400'
+                    ? 'bg-zinc-200 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white'
+                    : 'bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-500'
                 }`}>
                   {habitCount}
                 </span>
@@ -66,16 +62,32 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, habitCount
         })}
       </nav>
 
-      {/* Dark mode toggle */}
-      <div className="p-4 border-t border-zinc-200 dark:border-zinc-900 space-y-1">
-        <button
-          onClick={toggleDark}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-200"
-        >
-          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          {isDark ? 'Light Mode' : 'Dark Mode'}
-        </button>
-        <p className="text-xs text-center text-zinc-300 dark:text-zinc-700 pb-1">Streakly v1.0</p>
+      {/* Dark mode toggle - Segmented Control */}
+      <div className="p-6 border-t border-zinc-200 dark:border-zinc-900/50">
+        <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-900/80 rounded-lg border border-zinc-200 dark:border-zinc-800/50">
+          <button
+            onClick={() => isDark && toggleDark()}
+            className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium transition-all ${
+              !isDark
+                ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/50'
+                : 'text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            <Sun className="w-3.5 h-3.5 stroke-[2]" />
+            Light
+          </button>
+          <button
+            onClick={() => !isDark && toggleDark()}
+            className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium transition-all ${
+              isDark
+                ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700'
+                : 'text-zinc-500 hover:text-zinc-700'
+            }`}
+          >
+            <Moon className="w-3.5 h-3.5 stroke-[2]" />
+            Dark
+          </button>
+        </div>
       </div>
     </aside>
   );

@@ -7,7 +7,7 @@ import HeatmapCalendar from './HeatmapCalendar';
 import CompletionChart from './CompletionChart';
 import WeekdayChart from './WeekdayChart';
 import HabitBreakdown from './HabitBreakdown';
-
+import { BarChart3 } from 'lucide-react';
 
 interface AnalyticsViewProps {
   habits: ReturnType<typeof useHabits>['habits'];
@@ -23,9 +23,9 @@ interface AnalyticsViewProps {
 }
 
 const FILTER_OPTIONS: { label: string; value: DateRangeFilter }[] = [
-  { label: '7 days', value: '7d' },
-  { label: '30 days', value: '30d' },
-  { label: 'All time', value: 'all' },
+  { label: '7D', value: '7d' },
+  { label: '30D', value: '30d' },
+  { label: 'ALL', value: 'all' },
 ];
 
 const AnalyticsView: React.FC<AnalyticsViewProps> = ({
@@ -63,18 +63,20 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
 
   if (habits.length === 0) {
     return (
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto pt-4">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Analytics</h2>
-            <p className="text-zinc-500 dark:text-zinc-400 mt-1">Track your progress over time</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">Metrics</h2>
+            <p className="text-sm text-zinc-500 tracking-wide mt-1">Aggregated behavioral analysis.</p>
           </div>
         </div>
-        <div className="text-center py-24 bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900">
-          <div className="text-6xl mb-6">📊</div>
-          <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3">No data yet</h3>
-          <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
-            Create some habits and start checking them off to see your analytics here.
+        <div className="text-center py-24 bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
+          <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-950 rounded-lg flex items-center justify-center mx-auto mb-4 text-zinc-400 border border-zinc-200 dark:border-zinc-800">
+            <BarChart3 className="w-5 h-5" />
+          </div>
+          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-2 tracking-wide">Insufficient Data</h3>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+            Establish routines and register activity to generate analytics reports.
           </p>
         </div>
       </div>
@@ -82,23 +84,23 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6 pt-4">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Analytics</h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-1">Your habit performance overview</p>
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">Metrics</h2>
+          <p className="text-sm text-zinc-500 tracking-wide mt-1">Aggregated behavioral analysis.</p>
         </div>
         {/* Date range filter */}
-        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
+        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800">
           {FILTER_OPTIONS.map(opt => (
             <button
               key={opt.value}
               onClick={() => setDateFilter(opt.value)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${
                 dateFilter === opt.value
-                  ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm'
-                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-700'
+                  : 'text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-transparent'
               }`}
             >
               {opt.label}
@@ -124,7 +126,7 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         <CompletionChart
           data={weeklyData}
           title="Completion Trend"
-          subtitle={`Weekly completion rate over the selected period`}
+          subtitle={`Weekly completion rate over selected period`}
         />
         <WeekdayChart data={weekdayData} />
       </div>

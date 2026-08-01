@@ -49,7 +49,6 @@ const SettingsView: React.FC = () => {
   };
 
   const urlBase64ToUint8Array = (base64String: string) => {
-    // Clean up the string in case it has quotes or whitespace from env vars
     const cleaned = base64String.replace(/[^A-Za-z0-9\+\/\-\_]/g, '');
     const padding = '='.repeat((4 - cleaned.length % 4) % 4);
     const base64 = (cleaned + padding)
@@ -77,8 +76,6 @@ const SettingsView: React.FC = () => {
       }
 
       let registration = await navigator.serviceWorker.register('/sw.js');
-      
-      // Wait until the service worker is fully active before subscribing
       registration = await navigator.serviceWorker.ready;
 
       const publicVapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
@@ -89,7 +86,6 @@ const SettingsView: React.FC = () => {
         applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
       });
 
-      // Save subscription to Supabase
       const subJSON = subscription.toJSON();
       const { error } = await supabase.from('push_subscriptions').insert({
         endpoint: subJSON.endpoint,
@@ -97,7 +93,7 @@ const SettingsView: React.FC = () => {
         auth: subJSON.keys?.auth,
       });
 
-      if (error && error.code !== '23505') { // Ignore unique constraint if already subscribed
+      if (error && error.code !== '23505') {
         throw error;
       }
 
@@ -132,59 +128,61 @@ const SettingsView: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-zinc-500">Loading settings...</div>;
+    return <div className="p-8 text-center text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Loading Settings...</div>;
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div>
-        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Settings</h2>
-        <p className="text-zinc-500 dark:text-zinc-400">Manage your notifications and daily reminders.</p>
+    <div className="max-w-3xl mx-auto space-y-6 pt-4">
+      <div className="mb-8">
+        <h2 className="text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">System Configuration</h2>
+        <p className="text-sm text-zinc-500 tracking-wide mt-1">Manage notifications, schedules, and account preferences.</p>
       </div>
 
       {message && (
-        <div className={`p-4 rounded-xl flex items-center gap-3 ${
-          message.type === 'success' ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+        <div className={`p-4 rounded-xl flex items-center gap-3 border ${
+          message.type === 'success' 
+            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
+            : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
         }`}>
-          {message.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-          <span className="font-medium">{message.text}</span>
+          {message.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+          <span className="text-sm font-medium">{message.text}</span>
         </div>
       )}
 
       {/* Push Notification Toggle */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-        <div className="flex items-start justify-between">
-          <div className="flex gap-4">
-            <div className="w-12 h-12 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center flex-shrink-0">
-              <Bell className="w-6 h-6 text-yellow-600 dark:text-yellow-500" />
+      <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-xl p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center flex-shrink-0 border border-zinc-200 dark:border-zinc-800">
+              <Bell className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Push Notifications</h3>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm">
-                Receive reminders on your device even when the app is closed.
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Push Notifications</h3>
+              <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1 max-w-sm">
+                Receive device-level alerts for scheduled routines
               </p>
             </div>
           </div>
           <button
             onClick={handleEnablePush}
             disabled={pushEnabled}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all border ${
               pushEnabled
-                ? 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed'
-                : 'bg-yellow-500 hover:bg-yellow-600 text-white shadow-md'
+                ? 'bg-transparent border-emerald-500/30 text-emerald-500 cursor-default'
+                : 'bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 border-transparent shadow-sm'
             }`}
           >
-            {pushEnabled ? 'Enabled' : 'Enable'}
+            {pushEnabled ? 'Authorized' : 'Enable Access'}
           </button>
         </div>
       </div>
 
       {/* Reminders List */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Daily Reminders</h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Customize the times and messages for your 3 daily reminders. Times should be in your local timezone.
+      <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800/80">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Daily Reminders</h3>
+          <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1">
+            Configure system alerts. Times localized to current timezone.
           </p>
         </div>
         
@@ -192,22 +190,22 @@ const SettingsView: React.FC = () => {
           {reminders.map((reminder, index) => (
             <div key={reminder.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
               <div className="md:col-span-1">
-                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Time (24h)</label>
+                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Time (24h)</label>
                 <input
                   type="time"
                   value={reminder.time_of_day}
                   onChange={(e) => updateReminder(reminder.id, 'time_of_day', e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-black text-zinc-900 dark:text-white focus:ring-2 focus:ring-yellow-500 outline-none"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
                 />
               </div>
               <div className="md:col-span-3">
-                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Message</label>
+                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Message Payload</label>
                 <input
                   type="text"
                   value={reminder.message}
                   onChange={(e) => updateReminder(reminder.id, 'message', e.target.value)}
-                  placeholder="Enter reminder message..."
-                  className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-black text-zinc-900 dark:text-white focus:ring-2 focus:ring-yellow-500 outline-none"
+                  placeholder="Enter reminder payload..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
                 />
               </div>
             </div>
@@ -217,12 +215,12 @@ const SettingsView: React.FC = () => {
             <button
               onClick={handleSaveReminders}
               disabled={saving || reminders.length === 0}
-              className="flex items-center gap-2 px-6 py-2.5 bg-zinc-900 hover:bg-black dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black rounded-xl font-semibold transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
             >
-              {saving ? 'Saving...' : (
+              {saving ? 'Synchronizing...' : (
                 <>
                   <Save className="w-4 h-4" />
-                  Save Changes
+                  Save Configurations
                 </>
               )}
             </button>
@@ -231,22 +229,22 @@ const SettingsView: React.FC = () => {
       </div>
 
       {/* Account Section */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-red-200 dark:border-red-900/30 shadow-sm mt-8">
-        <div className="flex items-start justify-between">
-          <div className="flex gap-4">
-            <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
-              <LogOut className="w-6 h-6 text-red-600 dark:text-red-500" />
+      <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-xl p-6 border border-red-200 dark:border-red-900/30 shadow-sm mt-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/20 flex items-center justify-center flex-shrink-0 border border-red-200 dark:border-red-900/50">
+              <LogOut className="w-4 h-4 text-red-600 dark:text-red-500" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Sign Out</h3>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm">
-                Signed in as <span className="font-medium text-zinc-700 dark:text-zinc-300">{user?.email}</span>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Terminate Session</h3>
+              <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1 max-w-sm">
+                Active connection: <span className="font-bold text-zinc-700 dark:text-zinc-400">{user?.email || 'Unknown'}</span>
               </p>
             </div>
           </div>
           <button
             onClick={signOut}
-            className="px-4 py-2 rounded-lg font-semibold bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 transition-all border border-red-200 dark:border-red-800/50"
+            className="px-4 py-2 rounded-lg text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 transition-all border border-red-200 dark:border-red-800/50"
           >
             Sign Out
           </button>

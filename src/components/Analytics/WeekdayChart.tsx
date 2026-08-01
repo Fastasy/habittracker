@@ -20,10 +20,10 @@ const CustomTooltip: React.FC<{ active?: boolean; payload?: { value: number; pay
 }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg px-3 py-2">
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">{payload[0].payload.day}</p>
-        <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">{payload[0].value}%</p>
-        <p className="text-xs text-zinc-400 dark:text-zinc-500">{payload[0].payload.total} check-ins</p>
+      <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl px-4 py-3 min-w-[120px]">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">{payload[0].payload.day}</p>
+        <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-500">{payload[0].value}%</p>
+        <p className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest mt-1">{payload[0].payload.total} events</p>
       </div>
     );
   }
@@ -35,42 +35,43 @@ const WeekdayChart: React.FC<WeekdayChartProps> = ({ data }) => {
   const bestDay = data.find(d => d.rate === maxRate);
 
   return (
-    <div className="bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900 p-6">
+    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
       <div className="flex items-start justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Consistency by Day</h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Which days you complete habits most</p>
+        <div className="flex flex-col gap-1">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Day Distribution</h3>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Adherence by day of week</p>
         </div>
         {bestDay && bestDay.rate > 0 && (
-          <div className="text-right">
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Best day</p>
-            <p className="font-bold text-yellow-600 dark:text-yellow-400">{bestDay.day}</p>
+          <div className="text-right flex flex-col gap-1">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Peak Day</p>
+            <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-500">{bestDay.day}</p>
           </div>
         )}
       </div>
       <div className="h-52">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" className="dark:[stroke:#374151]" vertical={false} />
+          <BarChart data={data} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:[stroke:rgba(63,63,70,0.4)]" vertical={false} />
             <XAxis
               dataKey="day"
-              tick={{ fontSize: 11, fill: '#9ca3af' }}
+              tick={{ fontSize: 10, fill: '#71717a', fontWeight: 600 }}
               axisLine={false}
               tickLine={false}
+              dy={10}
             />
             <YAxis
               domain={[0, 100]}
-              tick={{ fontSize: 11, fill: '#9ca3af' }}
+              tick={{ fontSize: 10, fill: '#71717a', fontWeight: 600 }}
               axisLine={false}
               tickLine={false}
               tickFormatter={v => `${v}%`}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99,102,241,0.05)' }} />
-            <Bar dataKey="rate" radius={[6, 6, 0, 0]} maxBarSize={40}>
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(16,185,129,0.05)' }} />
+            <Bar dataKey="rate" radius={[4, 4, 0, 0]} maxBarSize={40}>
               {data.map((entry, index) => (
                 <Cell
                   key={index}
-                  fill={entry.rate === maxRate && entry.rate > 0 ? '#4f46e5' : '#c4b5fd'}
+                  fill={entry.rate === maxRate && entry.rate > 0 ? '#10b981' : 'rgba(16,185,129,0.3)'}
                   fillOpacity={entry.total === 0 ? 0.3 : 1}
                 />
               ))}

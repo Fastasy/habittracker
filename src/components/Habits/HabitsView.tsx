@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus, LayoutList } from 'lucide-react';
 import { Habit } from '../../types/habit';
 import { useHabits } from '../../hooks/useHabits';
 import HabitCard from './HabitCard';
@@ -51,47 +51,47 @@ const HabitsView: React.FC<HabitsViewProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto pt-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-end justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">My Habits</h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-            {habits.length === 0 ? 'No habits yet' : `${habits.length} habit${habits.length !== 1 ? 's' : ''} tracked`}
+          <h2 className="text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">My Habits</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-500 tracking-wide mt-1">
+            {habits.length === 0 ? 'No routines configured' : `${habits.length} routine${habits.length !== 1 ? 's' : ''} tracked`}
           </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-sm"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4" />
           <span className="hidden sm:block">New Habit</span>
         </button>
       </div>
 
       {/* Empty state */}
       {habits.length === 0 && (
-        <div className="text-center py-20">
-          <div className="w-20 h-20 rounded-2xl bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center mx-auto mb-6">
-            <Sparkles className="w-10 h-10 text-yellow-400" />
+        <div className="text-center py-20 px-6 border border-dashed border-zinc-300 dark:border-zinc-800/80 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20">
+          <div className="w-16 h-16 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center mx-auto mb-5 text-zinc-400">
+            <LayoutList className="w-8 h-8 stroke-[1.5]" />
           </div>
-          <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Start Your Journey</h3>
-          <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-8 leading-relaxed">
-            Build the habits that will transform your life. Small steps, consistently taken, lead to extraordinary results.
+          <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2 tracking-tight">System Empty</h3>
+          <p className="text-xs text-zinc-500 tracking-wide max-w-sm mx-auto mb-6">
+            You haven't defined any routines yet. Start by creating your first habit below.
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-xs uppercase tracking-wider"
           >
-            <Plus className="w-5 h-5" />
-            Create Your First Habit
+            <Plus className="w-3.5 h-3.5" />
+            Initialize Routine
           </button>
         </div>
       )}
 
       {/* Habit grid */}
       {habits.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {habits.map(habit => (
             <HabitCard
               key={habit.id}
@@ -106,12 +106,12 @@ const HabitsView: React.FC<HabitsViewProps> = ({
           {/* Add button card */}
           <button
             onClick={() => setShowModal(true)}
-            className="bg-white dark:bg-zinc-800/50 rounded-2xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 p-5 flex flex-col items-center justify-center gap-3 hover:border-yellow-400 dark:hover:border-yellow-600 hover:bg-yellow-50/50 dark:hover:bg-yellow-900/10 transition-all min-h-[200px] group"
+            className="bg-transparent rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700/80 p-5 flex flex-col items-center justify-center gap-3 hover:border-emerald-500 hover:bg-emerald-500/5 transition-all min-h-[160px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center group-hover:bg-yellow-100 dark:group-hover:bg-yellow-900/30 transition-colors">
-              <Plus className="w-6 h-6 text-zinc-400 group-hover:text-yellow-500 transition-colors" />
+            <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-colors">
+              <Plus className="w-5 h-5 text-zinc-400 group-hover:text-emerald-500 transition-colors" />
             </div>
-            <span className="text-sm font-medium text-zinc-400 group-hover:text-yellow-500 transition-colors">Add Habit</span>
+            <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500 group-hover:text-emerald-500 transition-colors">Add Habit</span>
           </button>
         </div>
       )}

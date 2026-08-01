@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { Habit } from '../../types/habit';
+import { emojiToIcon } from '../../utils/iconMap';
 
 interface HabitCheckItemProps {
   habit: Habit;
@@ -8,147 +9,85 @@ interface HabitCheckItemProps {
   onToggle: () => void;
 }
 
-const Particle: React.FC<{ color: string; index: number }> = ({ color, index }) => {
-  const angle = (index / 8) * 360;
-  const distance = 24 + Math.random() * 10;
-  const x = Math.cos((angle * Math.PI) / 180) * distance;
-  const y = Math.sin((angle * Math.PI) / 180) * distance;
-  const size = 3 + Math.floor(Math.random() * 3);
-
-  return (
-    <div
-      className="absolute rounded-full pointer-events-none"
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: color,
-        left: '50%',
-        top: '50%',
-        transform: `translate(${x}px, ${y}px)`,
-        animation: `particle-pop 0.5s ease-out forwards`,
-        animationDelay: `${index * 20}ms`,
-        opacity: 0.9,
-      }}
-    />
-  );
-};
-
 const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onToggle }) => {
   const [justCompleted, setJustCompleted] = useState(false);
   const handleToggle = () => {
     if (!completed) {
       setJustCompleted(true);
-      setTimeout(() => setJustCompleted(false), 700);
+      setTimeout(() => setJustCompleted(false), 300);
     }
     onToggle();
   };
 
   return (
     <div
-      className={`relative flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer select-none group ${
+      className={`relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 cursor-pointer select-none group ${
         completed
-          ? 'bg-white dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-900/60'
-          : 'bg-white dark:bg-black border-zinc-200 dark:border-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md dark:hover:shadow-black/20 active:scale-[0.99]'
+          ? 'bg-zinc-50 dark:bg-zinc-900/40 border-zinc-200 dark:border-zinc-800/80'
+          : 'bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-800/40'
       }`}
       onClick={handleToggle}
     >
       {/* Checkbox with animation */}
       <div className="relative flex-shrink-0">
         <button
-          className={`relative w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-            justCompleted ? 'scale-125' : completed ? 'scale-100' : 'scale-100 group-hover:scale-110'
+          className={`relative w-6 h-6 rounded flex items-center justify-center transition-all duration-200 ${
+            justCompleted ? 'scale-110' : 'scale-100'
+          } ${
+            completed 
+              ? 'bg-emerald-500 border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+              : 'border border-zinc-300 dark:border-zinc-600 bg-transparent group-hover:border-emerald-500/50'
           }`}
-          style={
-            completed
-              ? { backgroundColor: habit.color, borderColor: habit.color }
-              : { borderColor: '#d1d5db' }
-          }
           onClick={e => { e.stopPropagation(); handleToggle(); }}
         >
-          {completed ? (
-            <Check
-              className={`w-3.5 h-3.5 text-white transition-all duration-200 ${justCompleted ? 'scale-125' : 'scale-100'}`}
-              strokeWidth={3}
-            />
-          ) : (
-            <Check
-              className="w-3 h-3 opacity-0 group-hover:opacity-20 transition-opacity"
-              strokeWidth={3}
-              style={{ color: habit.color }}
-            />
+          {completed && (
+            <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
           )}
         </button>
-
-        {/* Ping ring on complete */}
-        {justCompleted && (
-          <div
-            className="absolute inset-0 rounded-full animate-ping"
-            style={{ backgroundColor: habit.color, opacity: 0.3 }}
-          />
-        )}
-        {/* Particles - always rendered when justCompleted */}
-        {justCompleted && Array.from({ length: 8 }, (_, i) => (
-          <Particle key={i} color={habit.color} index={i} />
-        ))}
       </div>
 
-      {/* Emoji icon */}
+      {/* Icon instead of Emoji */}
       <div
-        className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 transition-all duration-300 ${
-          completed ? 'opacity-50 grayscale-[60%]' : 'group-hover:scale-105'
+        className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+          completed ? 'opacity-40 grayscale' : 'opacity-80 group-hover:opacity-100'
         }`}
         style={{
-          backgroundColor: completed ? '#f3f4f6' : habit.color + '18',
-          border: `2px solid ${completed ? 'transparent' : habit.color + '30'}`,
+          color: habit.color,
+          backgroundColor: completed ? 'transparent' : habit.color + '15',
         }}
       >
-        {habit.emoji}
+        {emojiToIcon(habit.emoji, "w-5 h-5")}
       </div>
 
       {/* Text */}
       <div className="flex-1 min-w-0">
         <p
-          className={`font-semibold transition-all duration-300 truncate ${
+          className={`font-medium tracking-wide transition-all duration-200 truncate ${
             completed
-              ? 'text-zinc-400 dark:text-zinc-500 line-through decoration-zinc-300 dark:decoration-zinc-600'
+              ? 'text-zinc-400 dark:text-zinc-500 line-through decoration-zinc-300 dark:decoration-zinc-700/50'
               : habit.isBad 
                 ? 'text-red-600 dark:text-red-400' 
-                : 'text-zinc-900 dark:text-white'
+                : 'text-zinc-900 dark:text-zinc-100'
           }`}
         >
           {habit.name}
         </p>
-        <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+        <p className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-0.5 uppercase tracking-widest">
           {habit.frequency === 'daily' && 'Every day'}
           {habit.frequency === 'specific_days' &&
             (habit.specificDays ?? [])
               .sort((a, b) => a - b)
               .map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d])
               .join(', ')}
-          {habit.frequency === 'times_per_week' && `${habit.timesPerWeek}× per week`}
+          {habit.frequency === 'times_per_week' && `${habit.timesPerWeek}× / week`}
         </p>
       </div>
 
       {/* Done badge */}
       {completed && (
-        <div
-          className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
-          style={{
-            backgroundColor: habit.color + '15',
-            color: habit.color,
-          }}
-        >
+        <div className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
           <Check className="w-3 h-3" strokeWidth={3} />
           {habit.isBad ? 'Avoided' : 'Done'}
-        </div>
-      )}
-
-      {/* Uncompleted tap hint */}
-      {!completed && (
-        <div className="flex-shrink-0 text-zinc-200 dark:text-zinc-700 group-hover:text-zinc-300 dark:group-hover:text-zinc-600 transition-colors">
-          <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center">
-            <Check className="w-3 h-3" strokeWidth={3} />
-          </div>
         </div>
       )}
     </div>

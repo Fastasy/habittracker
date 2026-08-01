@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Check } from 'lucide-react';
 import { Habit, FrequencyType } from '../../types/habit';
+import { emojiToIcon } from '../../utils/iconMap';
 
 const EMOJI_OPTIONS = [
   '🏃', '💪', '📚', '🧘', '💧', '🥗', '😴', '🎯', '✍️', '🎵',
@@ -9,18 +10,18 @@ const EMOJI_OPTIONS = [
 ];
 
 const COLOR_OPTIONS = [
-  { label: 'Violet', value: '#7c3aed' },
-  { label: 'Indigo', value: '#4f46e5' },
-  { label: 'Blue', value: '#2563eb' },
-  { label: 'Cyan', value: '#0891b2' },
-  { label: 'Teal', value: '#0d9488' },
-  { label: 'Green', value: '#16a34a' },
-  { label: 'Lime', value: '#65a30d' },
-  { label: 'Yellow', value: '#ca8a04' },
-  { label: 'Orange', value: '#ea580c' },
-  { label: 'Red', value: '#dc2626' },
-  { label: 'Pink', value: '#db2777' },
-  { label: 'Rose', value: '#e11d48' },
+  { label: 'Emerald', value: '#10b981' },
+  { label: 'Teal', value: '#14b8a6' },
+  { label: 'Cyan', value: '#06b6d4' },
+  { label: 'Blue', value: '#3b82f6' },
+  { label: 'Indigo', value: '#6366f1' },
+  { label: 'Violet', value: '#8b5cf6' },
+  { label: 'Fuchsia', value: '#d946ef' },
+  { label: 'Rose', value: '#f43f5e' },
+  { label: 'Red', value: '#ef4444' },
+  { label: 'Orange', value: '#f97316' },
+  { label: 'Amber', value: '#f59e0b' },
+  { label: 'Yellow', value: '#eab308' },
 ];
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -35,7 +36,7 @@ interface HabitModalProps {
 const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
   const [name, setName] = useState(habit?.name ?? '');
   const [emoji, setEmoji] = useState(habit?.emoji ?? '🎯');
-  const [color, setColor] = useState(habit?.color ?? '#7c3aed');
+  const [color, setColor] = useState(habit?.color ?? '#10b981');
   const [frequency, setFrequency] = useState<FrequencyType>(habit?.frequency ?? 'daily');
   const [specificDays, setSpecificDays] = useState<number[]>(habit?.specificDays ?? [1, 2, 3, 4, 5]);
   const [timesPerWeek, setTimesPerWeek] = useState(habit?.timesPerWeek ?? 3);
@@ -71,86 +72,86 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-black rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="absolute inset-0 bg-zinc-950/80 backdrop-blur-md" onClick={onClose} />
+      <div className="relative bg-zinc-50 dark:bg-zinc-950 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-900">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
-            {habit ? 'Edit Habit' : 'New Habit'}
+        <div className="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800/80">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">
+            {habit ? 'Configure Routine' : 'Initialize Routine'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-200/50 dark:hover:bg-zinc-800 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Name */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
-              Habit Name
+            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
+              Routine Name
             </label>
             <input
               type="text"
               value={name}
               onChange={e => { setName(e.target.value); setNameError(''); }}
               placeholder="e.g., Morning Run, Read 20 pages..."
-              className="w-full px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all"
+              className="w-full px-3 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
             />
             {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
           </div>
 
           {/* Habit Type */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
-              Type
+            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
+              Behavior Type
             </label>
-            <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl">
+            <div className="flex bg-zinc-200 dark:bg-zinc-900 p-1 rounded-lg border border-zinc-300/50 dark:border-zinc-800">
               <button
                 type="button"
                 onClick={() => setIsBad(false)}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${
                   !isBad
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm'
-                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
+                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                    : 'text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                 }`}
               >
-                Good Habit
+                Positive
               </button>
               <button
                 type="button"
                 onClick={() => setIsBad(true)}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${
                   isBad
-                    ? 'bg-white dark:bg-zinc-700 text-red-600 dark:text-red-400 shadow-sm'
-                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
+                    ? 'bg-white dark:bg-zinc-800 text-red-600 dark:text-red-400 shadow-sm'
+                    : 'text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                 }`}
               >
-                Bad Habit
+                Negative
               </button>
             </div>
           </div>
 
-          {/* Emoji */}
+          {/* Icon */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
-              Icon
+            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
+              Iconography
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1 scrollbar-hide border border-zinc-200 dark:border-zinc-800/80 rounded-lg bg-white dark:bg-zinc-900/50">
               {EMOJI_OPTIONS.map(e => (
                 <button
                   key={e}
                   type="button"
                   onClick={() => setEmoji(e)}
-                  className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all ${
+                  className={`w-9 h-9 rounded-md flex items-center justify-center transition-all ${
                     emoji === e
-                      ? 'ring-2 ring-yellow-500 bg-yellow-50 dark:bg-yellow-900/30 scale-110'
-                      : 'bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+                      ? 'ring-1 ring-emerald-500 bg-emerald-500/10 text-emerald-500'
+                      : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
-                  {e}
+                  {emojiToIcon(e, "w-4 h-4")}
                 </button>
               ))}
             </div>
@@ -158,8 +159,8 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
 
           {/* Color */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
-              Color
+            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
+              Accent Color
             </label>
             <div className="flex flex-wrap gap-2">
               {COLOR_OPTIONS.map(c => (
@@ -168,34 +169,34 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
                   type="button"
                   onClick={() => setColor(c.value)}
                   title={c.label}
-                  className="w-8 h-8 rounded-full flex items-center justify-center transition-transform hover:scale-110"
+                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-transform hover:scale-110 border border-transparent ${
+                    color === c.value ? 'ring-2 ring-zinc-950 dark:ring-white ring-offset-2 ring-offset-zinc-50 dark:ring-offset-zinc-950' : ''
+                  }`}
                   style={{ backgroundColor: c.value }}
-                >
-                  {color === c.value && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-                </button>
+                />
               ))}
             </div>
           </div>
 
           {/* Frequency */}
           <div>
-            <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
-              Frequency
+            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
+              Cadence
             </label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { value: 'daily', label: 'Every Day' },
                 { value: 'specific_days', label: 'Specific Days' },
-                { value: 'times_per_week', label: 'X Times / Week' },
+                { value: 'times_per_week', label: 'X / Week' },
               ].map(opt => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => setFrequency(opt.value as FrequencyType)}
-                  className={`px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                  className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                     frequency === opt.value
-                      ? 'bg-yellow-600 text-white shadow-md'
-                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                      ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-sm'
+                      : 'bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-700'
                   }`}
                 >
                   {opt.label}
@@ -212,10 +213,10 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
                     type="button"
                     onClick={() => toggleDay(idx)}
                     title={DAY_FULL[idx]}
-                    className={`flex-1 aspect-square rounded-lg text-xs font-bold transition-all ${
+                    className={`flex-1 aspect-square rounded-md text-xs font-bold transition-all border ${
                       specificDays.includes(idx)
-                        ? 'text-white shadow-sm'
-                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                        ? 'border-transparent text-white shadow-sm'
+                        : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 hover:border-zinc-300 dark:hover:border-zinc-700'
                     }`}
                     style={specificDays.includes(idx) ? { backgroundColor: color } : {}}
                   >
@@ -228,17 +229,17 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
             {/* Times per week */}
             {frequency === 'times_per_week' && (
               <div className="mt-3 flex items-center gap-3">
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">Times per week:</span>
+                <span className="text-xs text-zinc-500">Frequency:</span>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setTimesPerWeek(Math.max(1, timesPerWeek - 1))}
-                    className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-lg flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                    className="w-7 h-7 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-bold flex items-center justify-center hover:bg-zinc-300 dark:hover:bg-zinc-700"
                   >
                     −
                   </button>
                   <span
-                    className="w-8 text-center text-lg font-bold"
+                    className="w-6 text-center text-sm font-bold"
                     style={{ color }}
                   >
                     {timesPerWeek}
@@ -246,7 +247,7 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
                   <button
                     type="button"
                     onClick={() => setTimesPerWeek(Math.min(7, timesPerWeek + 1))}
-                    className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-lg flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                    className="w-7 h-7 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-bold flex items-center justify-center hover:bg-zinc-300 dark:hover:bg-zinc-700"
                   >
                     +
                   </button>
@@ -256,40 +257,40 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
           </div>
 
           {/* Preview */}
-          <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-900 bg-white dark:bg-zinc-800/50">
-            <p className="text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wider">Preview</p>
+          <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 backdrop-blur-sm">
+            <p className="text-[10px] font-bold text-zinc-400 mb-3 uppercase tracking-widest">Preview</p>
             <div className="flex items-center gap-3">
               <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shadow-sm"
-                style={{ backgroundColor: color + '20', border: `2px solid ${color}40` }}
+                className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
+                style={{ backgroundColor: color + '15', color: color }}
               >
-                {emoji}
+                {emojiToIcon(emoji, "w-5 h-5")}
               </div>
               <div>
-                <p className="font-semibold text-zinc-900 dark:text-white">{name || 'Your Habit'}</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="font-semibold text-sm tracking-wide text-zinc-900 dark:text-zinc-100">{name || 'Routine Name'}</p>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-500 mt-0.5">
                   {frequency === 'daily' && 'Every day'}
                   {frequency === 'specific_days' && specificDays.length > 0 && DAY_FULL.filter((_, i) => specificDays.includes(i)).join(', ')}
-                  {frequency === 'times_per_week' && `${timesPerWeek}x per week`}
+                  {frequency === 'times_per_week' && `${timesPerWeek}x / week`}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium hover:bg-white dark:hover:bg-zinc-800 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 rounded-xl bg-yellow-600 hover:bg-yellow-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold shadow-md hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
             >
-              {habit ? 'Save Changes' : 'Create Habit'}
+              {habit ? 'Save Configuration' : 'Initialize Routine'}
             </button>
           </div>
         </form>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../../utils/supabase';
-import { Sparkles, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { Command, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AuthView: React.FC = () => {
@@ -44,43 +44,25 @@ const AuthView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center p-4 selection:bg-yellow-500/30">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, type: 'spring' }}
-            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-yellow-500/20"
-          >
-            <Sparkles className="w-8 h-8 text-white" />
-          </motion.div>
-          <motion.h1 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-            className="text-3xl font-bold text-zinc-900 dark:text-white mb-2"
-          >
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4 selection:bg-emerald-500/30">
+      <div className="w-full max-w-[380px]">
+        {/* Brand Header */}
+        <div className="flex flex-col items-center mb-10">
+          <div className="w-12 h-12 rounded-xl bg-zinc-900 dark:bg-white flex items-center justify-center mb-6 shadow-md border border-zinc-200 dark:border-zinc-800">
+            <Command className="w-6 h-6 text-white dark:text-zinc-900" />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white mb-2">
             Streakly
-          </motion.h1>
-          <motion.p 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-zinc-500 dark:text-zinc-400"
-          >
-            Build better habits, one day at a time.
-          </motion.p>
+          </h1>
+          <p className="text-sm text-zinc-500 tracking-wide text-center">
+            Executive performance tracking.
+          </p>
         </div>
 
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-sm border border-zinc-200 dark:border-zinc-800"
-        >
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 text-center">
-            {isLogin ? 'Welcome back' : 'Create your account'}
+        {/* Auth Card */}
+        <div className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800/80">
+          <h2 className="text-base font-medium text-zinc-900 dark:text-white mb-6 text-center">
+            {isLogin ? 'Sign in to your account' : 'Initialize new account'}
           </h2>
 
           <AnimatePresence mode="wait">
@@ -89,7 +71,7 @@ const AuthView: React.FC = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm p-4 rounded-xl mb-6 border border-red-100 dark:border-red-900/50"
+                className="bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-medium p-3 rounded-lg mb-6 border border-red-500/20"
               >
                 {error}
               </motion.div>
@@ -99,19 +81,19 @@ const AuthView: React.FC = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-sm p-4 rounded-xl mb-6 border border-green-100 dark:border-green-900/50"
+                className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium p-3 rounded-lg mb-6 border border-emerald-500/20"
               >
                 {message}
               </motion.div>
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Email Address</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5">Email Address</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-zinc-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-4 w-4 text-zinc-400" />
                 </div>
                 <input
                   type="email"
@@ -119,17 +101,17 @@ const AuthView: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="email"
-                  className="block w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors text-zinc-900 dark:text-white placeholder-zinc-400"
-                  placeholder="you@example.com"
+                  className="block w-full pl-9 pr-3 py-2 text-sm bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600"
+                  placeholder="name@company.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Password</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5">Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-zinc-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-4 w-4 text-zinc-400" />
                 </div>
                 <input
                   type="password"
@@ -137,7 +119,7 @@ const AuthView: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete={isLogin ? "current-password" : "new-password"}
-                  className="block w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors text-zinc-900 dark:text-white placeholder-zinc-400"
+                  className="block w-full pl-9 pr-3 py-2 text-sm bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600"
                   placeholder="••••••••"
                 />
               </div>
@@ -146,32 +128,32 @@ const AuthView: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium text-white bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-white dark:focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  {isLogin ? 'Sign In' : 'Sign Up'}
-                  <ArrowRight className="w-4 h-4" />
+                  {isLogin ? 'Authenticate' : 'Create Account'}
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <button
               onClick={() => {
                 setIsLogin(!isLogin);
                 setError(null);
                 setMessage(null);
               }}
-              className="text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+              className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
             >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              {isLogin ? "Request access? Sign up" : 'Already authorized? Sign in'}
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
