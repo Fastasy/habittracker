@@ -238,7 +238,7 @@ const GoalModal: React.FC<GoalModalProps> = ({
             form="goal-form"
             className="px-4 py-2 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-all shadow-md hover:shadow-lg hover:shadow-emerald-500/20"
           >
-            {existingGoal ? 'Save Configuration' : 'Commit Objective'}
+            {existingGoal ? 'Save Campaign' : 'Launch Campaign'}
           </button>
         </div>
       </div>

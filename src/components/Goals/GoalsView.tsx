@@ -16,6 +16,7 @@ interface GoalsViewProps {
   onToggleTodo: (id: string) => void;
   onClearGoalTodoLinks: (goalId: string) => void;
   getCompletionRate: (habitId: string, days: string[]) => number;
+  getStreak?: (habitId: string) => { current: number; longest: number };
   latestWeight?: number;
 }
 
@@ -30,6 +31,7 @@ const GoalsView: React.FC<GoalsViewProps> = ({
   onToggleTodo,
   onClearGoalTodoLinks,
   getCompletionRate,
+  getStreak,
   latestWeight
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,10 +86,10 @@ const GoalsView: React.FC<GoalsViewProps> = ({
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-            Objectives
+            Campaigns
           </h2>
           <p className="text-sm text-zinc-500 tracking-wide mt-1">
-            High-level metrics and macro-targets.
+            Long-haul objectives. Link quests and to-dos to push them forward.
           </p>
         </div>
         <button
@@ -95,7 +97,7 @@ const GoalsView: React.FC<GoalsViewProps> = ({
           className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-sm font-semibold rounded-lg transition-all shadow-sm"
         >
           <Plus className="w-4 h-4" />
-          Initialize Objective
+          New Campaign
         </button>
       </header>
 
@@ -104,16 +106,16 @@ const GoalsView: React.FC<GoalsViewProps> = ({
           <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-950 rounded-lg flex items-center justify-center mx-auto mb-4 text-zinc-400 border border-zinc-200 dark:border-zinc-800">
             <Target className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-white mb-2 tracking-wide">No Active Objectives</h3>
+          <h3 className="text-base font-semibold text-zinc-900 dark:text-white mb-2 tracking-wide">No Active Campaigns</h3>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
-            Define high-level objectives and map habits to them to track aggregate performance.
+            Define a high-level objective and map quests to it to track aggregate performance.
           </p>
           <button
             onClick={() => handleOpenModal()}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-sm font-semibold rounded-lg transition-all shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            Create Objective
+            Create Campaign
           </button>
         </div>
       ) : (
@@ -125,6 +127,7 @@ const GoalsView: React.FC<GoalsViewProps> = ({
               habits={habits}
               todos={todos.filter(t => t.goalId === goal.id)}
               onToggleTodo={onToggleTodo}
+              getStreak={getStreak}
               getCompletionRate={getCompletionRate}
               latestWeight={latestWeight}
               onEdit={() => handleOpenModal(goal)}

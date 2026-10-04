@@ -169,7 +169,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
       </div>
 
       {/* Split: month grid + day panel */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)] items-start">
+      {/* `grid-cols-1` (= minmax(0,1fr)) matters: with no base column the mobile
+          track is `auto`, which sizes to max-content and lets wide children push
+          the whole page past the viewport. */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)] items-start">
         {/* ---------------- Month grid ---------------- */}
         <div className={`${card} p-5`}>
           <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">

@@ -54,3 +54,54 @@ body {
 * {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ------------------------------------------------------------------ game mode */
+
+/* Deep-field backdrop so the dark theme reads as a HUD, not a document. */
+.dark body {
+  background-color: #09090b;
+  background-image:
+    radial-gradient(1200px 600px at 15% -10%, rgba(99, 102, 241, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 95% 0%, rgba(16, 185, 129, 0.08), transparent 55%);
+  background-attachment: fixed;
+}
+
+body {
+  background-image:
+    radial-gradient(1100px 520px at 12% -12%, rgba(99, 102, 241, 0.07), transparent 60%),
+    radial-gradient(900px 480px at 98% 0%, rgba(16, 185, 129, 0.06), transparent 55%);
+  background-attachment: fixed;
+}
+
+/* XP bars and level rings get a soft glow so progress reads as energy. */
+@keyframes xp-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.xp-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: xp-shimmer 2.6s ease-in-out infinite;
+}
+
+@keyframes rank-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; opacity: 0.9; }
+  50%      { box-shadow: 0 0 18px 2px currentColor; opacity: 1; }
+}
+
+.rank-pulse { animation: rank-pulse 2.8s ease-in-out infinite; }
+
+/* A cleared board gets a slow celebratory sheen. */
+@keyframes board-clear {
+  0%, 100% { box-shadow: 0 0 24px -6px rgba(16, 185, 129, 0.35); }
+  50%      { box-shadow: 0 0 40px -4px rgba(16, 185, 129, 0.55); }
+}
+
+.board-clear { animation: board-clear 3.2s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-shimmer::after, .rank-pulse, .board-clear { animation: none; }
+}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Pencil, Trash2, Flame, Trophy, TrendingUp, MoreVertical } from 'lucide-react';
 import { Habit, StreakInfo } from '../../types/habit';
 import { emojiToIcon } from '../../utils/iconMap';
+import { completionXp } from '../../game/xp';
 import InfoTooltip from '../InfoTooltip';
 
 interface HabitCardProps {
@@ -99,8 +100,22 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, streak, completionRate, mi
           </div>
           <div>
             <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide text-sm">{habit.name}</h3>
-            <div className="mt-1">
+            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
               <FrequencyBadge habit={habit} />
+              <span
+                className="text-[10px] font-bold px-1.5 py-0.5 rounded border text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20 tabular-nums"
+                title="XP banked each time you clear this quest, at your current combo"
+              >
+                +{completionXp(Math.max(1, currentStreak))} XP
+              </span>
+              {currentStreak >= 2 && (
+                <span
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded border text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/25 tabular-nums"
+                  title="Active streak"
+                >
+                  🔥 {currentStreak}d
+                </span>
+              )}
             </div>
           </div>
         </div>

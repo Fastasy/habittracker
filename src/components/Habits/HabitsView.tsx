@@ -55,9 +55,9 @@ const HabitsView: React.FC<HabitsViewProps> = ({
       {/* Header */}
       <div className="flex items-end justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">My Habits</h2>
+          <h2 className="text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">Quest Log</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-500 tracking-wide mt-1">
-            {habits.length === 0 ? 'No routines configured' : `${habits.length} routine${habits.length !== 1 ? 's' : ''} tracked`}
+            {habits.length === 0 ? 'No quests configured' : `${habits.length} quest${habits.length !== 1 ? 's' : ''} active`}
           </p>
         </div>
         <button
@@ -65,7 +65,7 @@ const HabitsView: React.FC<HabitsViewProps> = ({
           className="flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-sm"
         >
           <Plus className="w-4 h-4" />
-          <span className="hidden sm:block">New Habit</span>
+          <span className="hidden sm:block">New Quest</span>
         </button>
       </div>
 
@@ -84,7 +84,7 @@ const HabitsView: React.FC<HabitsViewProps> = ({
             className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-xs uppercase tracking-wider"
           >
             <Plus className="w-3.5 h-3.5" />
-            Initialize Routine
+            Create Quest
           </button>
         </div>
       )}
@@ -111,7 +111,7 @@ const HabitsView: React.FC<HabitsViewProps> = ({
             <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-colors">
               <Plus className="w-5 h-5 text-zinc-400 group-hover:text-emerald-500 transition-colors" />
             </div>
-            <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500 group-hover:text-emerald-500 transition-colors">Add Habit</span>
+            <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500 group-hover:text-emerald-500 transition-colors">Add Quest</span>
           </button>
         </div>
       )}

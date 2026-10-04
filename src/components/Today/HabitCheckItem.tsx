@@ -9,9 +9,13 @@ interface HabitCheckItemProps {
   onToggle: () => void;
   currentAmount?: number;
   onLogAmount?: (amount: number) => void;
+  /** XP this check-in banks (game layer). Optional — omit to hide. */
+  xp?: number;
+  /** Current streak, shown as a combo multiplier. */
+  combo?: number;
 }
 
-const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onToggle, currentAmount = 0, onLogAmount }) => {
+const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onToggle, currentAmount = 0, onLogAmount, xp, combo = 0 }) => {
   const [justCompleted, setJustCompleted] = useState(false);
   const [tempAmount, setTempAmount] = useState(currentAmount.toString());
   
@@ -99,17 +103,39 @@ const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onTog
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p
-          className={`font-medium tracking-wide transition-all duration-200 truncate ${
-            completed
-              ? 'text-zinc-400 dark:text-zinc-500 line-through decoration-zinc-300 dark:decoration-zinc-700/50'
-              : habit.isBad 
-                ? 'text-red-600 dark:text-red-400' 
-                : 'text-zinc-900 dark:text-zinc-100'
-          }`}
-        >
-          {habit.name}
-        </p>
+        <div className="flex items-center gap-2">
+          <p
+            className={`font-medium tracking-wide transition-all duration-200 truncate ${
+              completed
+                ? 'text-zinc-400 dark:text-zinc-500 line-through decoration-zinc-300 dark:decoration-zinc-700/50'
+                : habit.isBad 
+                  ? 'text-red-600 dark:text-red-400' 
+                  : 'text-zinc-900 dark:text-zinc-100'
+            }`}
+          >
+            {habit.name}
+          </p>
+          {typeof xp === 'number' && (
+            <span
+              className={`flex-shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded border tabular-nums transition-colors ${
+                completed
+                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+                  : 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20'
+              }`}
+              title="XP banked for clearing this quest"
+            >
+              +{xp} XP
+            </span>
+          )}
+          {combo >= 2 && (
+            <span
+              className="flex-shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded border text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/25 tabular-nums"
+              title="Active streak"
+            >
+              🔥 {combo}d
+            </span>
+          )}
+        </div>
         <p className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-0.5 uppercase tracking-widest flex items-center gap-2">
           {habit.isQuantifiable ? (
             <span className={completed ? "text-emerald-500/70" : "text-emerald-500 font-bold"}>

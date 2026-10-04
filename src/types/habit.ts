@@ -47,6 +47,6 @@ export interface StreakInfo {
   longest: number;
 }
 
-export type ViewType = 'today' | 'calendar' | 'habits' | 'analytics' | 'settings' | 'goals' | 'fitness';
+export type ViewType = 'today' | 'calendar' | 'habits' | 'analytics' | 'settings' | 'goals' | 'fitness' | 'achievements';
 
 export type DateRangeFilter = '7d' | '30d' | 'all';

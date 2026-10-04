@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, Edit2, Trash2, Crosshair, ListTodo } from 'lucide-react';
-import { Goal, Habit } from '../../types/habit';
+import { Goal, Habit, StreakInfo } from '../../types/habit';
 import { Todo } from '../../types/calendar';
 import { emojiToIcon } from '../../utils/iconMap';
 
@@ -14,10 +14,12 @@ interface GoalCardProps {
   /** To-dos linked to this objective (two-way with the Calendar view). */
   todos?: Todo[];
   onToggleTodo?: (id: string) => void;
+  /** Live streak of each linked quest, for the combo readout. */
+  getStreak?: (habitId: string) => StreakInfo;
 }
 
 const GoalCard: React.FC<GoalCardProps> = ({
-  goal, habits, onEdit, onDelete, getCompletionRate, latestWeight, todos = [], onToggleTodo,
+  goal, habits, onEdit, onDelete, getCompletionRate, latestWeight, todos = [], onToggleTodo, getStreak,
 }) => {
   const today = new Date();
   const last30Days = Array.from({ length: 30 }).map((_, i) => {
@@ -118,20 +120,26 @@ const GoalCard: React.FC<GoalCardProps> = ({
       </div>
 
       <div>
-        <h4 className="text-[9px] font-bold text-zinc-500 mb-2.5 uppercase tracking-widest">Correlated Habits</h4>
+        <h4 className="text-[9px] font-bold text-zinc-500 mb-2.5 uppercase tracking-widest">Linked Quests</h4>
         {linkedHabits.length === 0 ? (
-          <p className="text-xs text-zinc-400 dark:text-zinc-600 italic">No habits linked.</p>
+          <p className="text-xs text-zinc-400 dark:text-zinc-600 italic">No quests linked.</p>
         ) : (
           <div className="flex flex-wrap gap-1.5">
-            {linkedHabits.map(habit => (
-              <span 
-                key={habit.id} 
-                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800/50 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800"
-              >
-                <span className="text-[10px]">{emojiToIcon(habit.emoji, "w-3 h-3")}</span>
-                {habit.name}
-              </span>
-            ))}
+            {linkedHabits.map(habit => {
+              const streak = getStreak ? getStreak(habit.id).current : 0;
+              return (
+                <span 
+                  key={habit.id} 
+                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800/50 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800"
+                >
+                  <span className="text-[10px]">{emojiToIcon(habit.emoji, "w-3 h-3")}</span>
+                  {habit.name}
+                  {streak >= 2 && (
+                    <span className="text-orange-500 font-bold" title={`${streak}-day streak`}>🔥{streak}</span>
+                  )}
+                </span>
+              );
+            })}
           </div>
         )}
       </div>

@@ -394,7 +394,7 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
               type="submit"
               className="flex-1 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold shadow-md hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
             >
-              {habit ? 'Save Configuration' : 'Initialize Routine'}
+              {habit ? 'Save Quest' : 'Deploy Quest'}
             </button>
           </div>
         </form>
