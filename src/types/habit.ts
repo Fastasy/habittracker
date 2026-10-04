@@ -24,6 +24,9 @@ export interface Habit {
   goalId?: string;
   pillarId?: string;
   value?: number;
+  isQuantifiable?: boolean;
+  targetAmount?: number;
+  unit?: string;
 }
 
 export interface HabitLog {
@@ -31,6 +34,7 @@ export interface HabitLog {
   date: string; // YYYY-MM-DD
   completed: boolean;
   completedAt?: string; // ISO timestamp
+  amount?: number;
 }
 
 export interface HabitStore {

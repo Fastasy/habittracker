@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 export interface HabitExtension {
   pillarId?: string;
   value?: number;
+  isQuantifiable?: boolean;
+  targetAmount?: number;
+  unit?: string;
 }
 
 const STORAGE_KEY = 'streakly_habit_extensions';

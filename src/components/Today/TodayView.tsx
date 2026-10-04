@@ -15,12 +15,14 @@ import InfoTooltip from '../InfoTooltip';
 
 interface TodayViewProps {
   habits: Habit[];
+  logs: ReturnType<typeof useHabits>['logs'];
   isCompleted: ReturnType<typeof useHabits>['isCompleted'];
   toggleLog: ReturnType<typeof useHabits>['toggleLog'];
+  logAmount: ReturnType<typeof useHabits>['logAmount'];
   getStreak: ReturnType<typeof useHabits>['getStreak'];
 }
 
-const TodayView: React.FC<TodayViewProps> = ({ habits, isCompleted, toggleLog }) => {
+const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggleLog, logAmount }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const { pillars, valueConfig, disciplineConfig, exportConfig } = useSettings();
   const momentumData = useMomentum();
@@ -414,6 +416,8 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, isCompleted, toggleLog })
                   habit={habit}
                   completed={false}
                   onToggle={() => toggleLog(habit.id, dateStr)}
+                  currentAmount={logs.find(l => l.habitId === habit.id && l.date === dateStr)?.amount}
+                  onLogAmount={(amount) => logAmount(habit.id, dateStr, amount)}
                 />
               </motion.div>
             ))}
@@ -441,6 +445,8 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, isCompleted, toggleLog })
                   habit={habit}
                   completed={true}
                   onToggle={() => toggleLog(habit.id, dateStr)}
+                  currentAmount={logs.find(l => l.habitId === habit.id && l.date === dateStr)?.amount}
+                  onLogAmount={(amount) => logAmount(habit.id, dateStr, amount)}
                 />
               </motion.div>
             ))}

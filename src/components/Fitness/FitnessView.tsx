@@ -71,7 +71,7 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
             </div>
           </div>
           
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-start sm:justify-end">
             <input
               type="date"
               value={dateStr}
@@ -80,23 +80,23 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
                   setSelectedDate(new Date(e.target.value));
                 }
               }}
-              className="px-3 py-2 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+              className="flex-1 min-w-[140px] sm:flex-none px-3 py-2 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
             />
             
-            <div className="relative flex items-center gap-2">
+            <div className="relative flex items-center gap-2 flex-1 min-w-[120px] sm:flex-none">
               <input
                 type="number"
                 step="0.1"
                 value={weightInput}
                 onChange={(e) => setWeightInput(e.target.value)}
                 placeholder="0.0"
-                className="w-24 px-3 py-2 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-right font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                className="w-full sm:w-24 px-3 py-2 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-right font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
               />
-              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">kg</span>
+              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest shrink-0">kg</span>
             </div>
             <button
               onClick={handleSaveWeight}
-              className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-sm font-semibold rounded-lg transition-all shadow-sm ml-2"
+              className="w-full sm:w-auto px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-sm font-semibold rounded-lg transition-all shadow-sm sm:ml-2"
             >
               Commit
             </button>

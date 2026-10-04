@@ -47,6 +47,10 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
   const [pillarId, setPillarId] = useState<string>(habit?.pillarId ?? (pillars.length > 0 ? pillars[0].id : ''));
   const [value, setValue] = useState<number | undefined>(habit?.value);
   
+  const [isQuantifiable, setIsQuantifiable] = useState(habit?.isQuantifiable ?? false);
+  const [targetAmount, setTargetAmount] = useState(habit?.targetAmount ?? 1);
+  const [unit, setUnit] = useState(habit?.unit ?? '');
+
   const [nameError, setNameError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,6 +67,10 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
       setNameError('Please select a pillar');
       return;
     }
+    if (isQuantifiable && targetAmount <= 0) {
+      setNameError('Target amount must be greater than zero');
+      return;
+    }
     onSave({
       name: name.trim(),
       emoji,
@@ -73,6 +81,9 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
       isBad,
       pillarId: pillars.length > 0 ? pillarId : undefined,
       value: valueConfig.active ? value : undefined,
+      isQuantifiable,
+      targetAmount: isQuantifiable ? targetAmount : undefined,
+      unit: isQuantifiable ? unit.trim() : undefined,
     });
   };
 
@@ -150,6 +161,51 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
               <p className="text-[10px] text-zinc-500 mt-1">Assign positive or negative {valueConfig.symbol} for completing this routine.</p>
             </div>
           )}
+
+          {/* Quantifiable Habit */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500">
+                Quantifiable Target
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={isQuantifiable}
+                  onChange={e => setIsQuantifiable(e.target.checked)}
+                />
+                <div className="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-zinc-600 peer-checked:bg-emerald-500"></div>
+              </label>
+            </div>
+            
+            {isQuantifiable && (
+              <div className="flex gap-3 mt-3">
+                <div className="flex-1">
+                  <input
+                    type="number"
+                    min="1"
+                    value={targetAmount}
+                    onChange={e => setTargetAmount(Number(e.target.value))}
+                    placeholder="e.g. 20"
+                    className="w-full px-3 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                  />
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={unit}
+                    onChange={e => setUnit(e.target.value)}
+                    placeholder="e.g. pages, km"
+                    className="w-full px-3 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                  />
+                </div>
+              </div>
+            )}
+            {isQuantifiable && (
+              <p className="text-[10px] text-zinc-500 mt-2">Instead of a checkbox, you'll log the exact amount completed each day.</p>
+            )}
+          </div>
 
           {/* Habit Type */}
           <div>

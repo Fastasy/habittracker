@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../utils/supabase';
 import { Habit, HabitStore, StreakInfo } from '../types/habit';
 import { useHabitExtensions } from './useHabitExtensions';
+import { useHabitLogExtensions } from './useHabitLogExtensions';
 import {
   today,
   toDateString,
@@ -19,6 +20,7 @@ export const useHabits = () => {
   const [store, setStore] = useState<HabitStore>({ habits: [], logs: [] });
   const [isLoading, setIsLoading] = useState(true);
   const { extensions, setExtension, deleteExtension } = useHabitExtensions();
+  const { logExtensions, setLogExtension, deleteLogExtension } = useHabitLogExtensions();
 
   useEffect(() => {
     const loadData = async () => {
@@ -67,8 +69,18 @@ export const useHabits = () => {
       ...h,
       pillarId: extensions[h.id]?.pillarId,
       value: extensions[h.id]?.value,
+      isQuantifiable: extensions[h.id]?.isQuantifiable,
+      targetAmount: extensions[h.id]?.targetAmount,
+      unit: extensions[h.id]?.unit,
     }));
   }, [store.habits, extensions]);
+
+  const mergedLogs = useMemo(() => {
+    return store.logs.map(l => ({
+      ...l,
+      amount: logExtensions[`${l.habitId}_${l.date}`]?.amount
+    }));
+  }, [store.logs, logExtensions]);
 
   const addHabit = useCallback((habit: Omit<Habit, 'id' | 'createdAt'>) => {
     const id = crypto.randomUUID();
@@ -81,7 +93,13 @@ export const useHabits = () => {
     setStore(prev => ({ ...prev, habits: [...prev.habits, newHabit] }));
     
     // Save extensions locally
-    setExtension(id, { pillarId: habit.pillarId, value: habit.value });
+    setExtension(id, { 
+      pillarId: habit.pillarId, 
+      value: habit.value,
+      isQuantifiable: habit.isQuantifiable,
+      targetAmount: habit.targetAmount,
+      unit: habit.unit
+    });
 
     supabase.from('habits').insert({
       id,
@@ -104,8 +122,20 @@ export const useHabits = () => {
       habits: prev.habits.map(h => (h.id === id ? { ...h, ...updates } : h)),
     }));
     
-    if (updates.pillarId !== undefined || updates.value !== undefined) {
-      setExtension(id, { pillarId: updates.pillarId, value: updates.value });
+    if (
+      updates.pillarId !== undefined || 
+      updates.value !== undefined ||
+      updates.isQuantifiable !== undefined ||
+      updates.targetAmount !== undefined ||
+      updates.unit !== undefined
+    ) {
+      setExtension(id, { 
+        pillarId: updates.pillarId, 
+        value: updates.value,
+        isQuantifiable: updates.isQuantifiable,
+        targetAmount: updates.targetAmount,
+        unit: updates.unit
+      });
     }
 
     const dbUpdates: any = {};
@@ -173,6 +203,49 @@ export const useHabits = () => {
       }
     });
   }, []);
+
+  const logAmount = useCallback((habitId: string, date: string, amount: number) => {
+    const habit = store.habits.find(h => h.id === habitId);
+    if (!habit) return;
+    
+    // We get the extensions from the outer scope, wait, store.habits doesn't have isQuantifiable.
+    // It's better to find it in mergedHabits, but we don't have mergedHabits in the dependency array yet.
+    // Actually, we can just use `extensions` which is available in the hook scope.
+    const ext = extensions[habitId];
+    if (!ext || !ext.isQuantifiable || !ext.targetAmount) return;
+
+    setLogExtension(habitId, date, { amount });
+
+    const isCompleted = amount >= ext.targetAmount;
+
+    setStore(prev => {
+      const existing = prev.logs.find(l => l.habitId === habitId && l.date === date);
+      if (existing) {
+        if (existing.completed !== isCompleted) {
+          const newLogs = prev.logs.map(l =>
+            l.habitId === habitId && l.date === date
+              ? { ...l, completed: isCompleted, completedAt: isCompleted ? new Date().toISOString() : undefined }
+              : l
+          );
+          supabase.from('habit_logs')
+            .update({ completed: isCompleted, completed_at: isCompleted ? new Date().toISOString() : null })
+            .eq('habit_id', habitId).eq('date', date)
+            .then(res => { if (res.error) console.error(res.error); });
+          return { ...prev, logs: newLogs };
+        }
+        return prev;
+      } else {
+        const completedAt = isCompleted ? new Date().toISOString() : undefined;
+        const newLogs = [...prev.logs, { habitId, date, completed: isCompleted, completedAt }];
+        
+        supabase.from('habit_logs')
+          .insert({ habit_id: habitId, date, completed: isCompleted, completed_at: completedAt })
+          .then(res => { if (res.error) console.error(res.error); });
+          
+        return { ...prev, logs: newLogs };
+      }
+    });
+  }, [store.habits, extensions, setLogExtension]);
 
   const isCompleted = useCallback(
     (habitId: string, date: string) => {
@@ -441,6 +514,7 @@ export const useHabits = () => {
     updateHabit,
     deleteHabit,
     toggleLog,
+    logAmount,
     isCompleted,
     getStreak,
     getCompletionRate,

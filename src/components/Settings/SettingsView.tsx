@@ -18,7 +18,7 @@ const EMOJI_OPTIONS = [
 const SettingsView: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-  const { signOut, user } = useAuth();
+  const { lock } = useAuth();
   
   const {
     pillars, addPillar, updatePillar, deletePillar,
@@ -247,7 +247,7 @@ const SettingsView: React.FC = () => {
         </div>
       </section>
 
-      {/* Account Section */}
+      {/* Session Section */}
       <section className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl p-6 border border-red-200 dark:border-red-900/30 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -255,17 +255,17 @@ const SettingsView: React.FC = () => {
               <LogOut className="w-4 h-4 text-red-600 dark:text-red-500" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Terminate Session</h3>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Lock This Device</h3>
               <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1 max-w-sm">
-                Active connection: <span className="font-bold text-zinc-700 dark:text-zinc-400">{user?.email || 'Unknown'}</span>
+                Clears the saved session. You'll need your access code to get back in.
               </p>
             </div>
           </div>
           <button
-            onClick={signOut}
+            onClick={lock}
             className="px-4 py-2 rounded-lg text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 transition-all border border-red-200 dark:border-red-800/50"
           >
-            Sign Out
+            Lock
           </button>
         </div>
       </section>

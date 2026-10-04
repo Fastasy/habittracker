@@ -10,21 +10,29 @@ import AnalyticsView from './components/Analytics/AnalyticsView';
 import SettingsView from './components/Settings/SettingsView';
 import GoalsView from './components/Goals/GoalsView';
 import FitnessView from './components/Fitness/FitnessView';
-import AuthView from './components/Auth/AuthView';
+import PasscodeView from './components/Auth/PasscodeView';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useGoals } from './hooks/useGoals';
 import { useWeight } from './hooks/useWeight';
 
-const AppContent: React.FC = () => {
+/**
+ * Data hooks live here, INSIDE the auth gate.
+ *
+ * They only mount once a session exists, so their initial Supabase fetch always
+ * runs WITH credentials. (Mounting them above the gate would fire the query
+ * unauthenticated, get zero rows back from RLS, and leave the app empty.)
+ */
+const AuthenticatedApp: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('today');
-  const { session, isLoading: isAuthLoading } = useAuth();
 
   const {
     habits,
+    logs,
     addHabit,
     updateHabit,
     deleteHabit,
     toggleLog,
+    logAmount,
     isCompleted,
     getStreak,
     getCompletionRate,
@@ -48,18 +56,6 @@ const AppContent: React.FC = () => {
     return sorted[0].weight;
   }, [weightLogs]);
 
-  if (isAuthLoading) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return <AuthView />;
-  }
-
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white transition-colors duration-300">
       <Sidebar
@@ -75,8 +71,10 @@ const AppContent: React.FC = () => {
           {currentView === 'today' && (
             <TodayView
               habits={habits}
+              logs={logs}
               isCompleted={isCompleted}
               toggleLog={toggleLog}
+              logAmount={logAmount}
               getStreak={getStreak}
             />
           )}
@@ -129,6 +127,24 @@ const AppContent: React.FC = () => {
       </main>
     </div>
   );
+};
+
+const AppContent: React.FC = () => {
+  const { isUnlocked, isLoading: isAuthLoading } = useAuth();
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!isUnlocked) {
+    return <PasscodeView />;
+  }
+
+  return <AuthenticatedApp />;
 };
 
 const App: React.FC = () => {
