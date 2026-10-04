@@ -1,6 +1,7 @@
 import React from 'react';
-import { Target, Calendar, Edit2, Trash2, Crosshair } from 'lucide-react';
+import { Calendar, Edit2, Trash2, Crosshair, ListTodo } from 'lucide-react';
 import { Goal, Habit } from '../../types/habit';
+import { Todo } from '../../types/calendar';
 import { emojiToIcon } from '../../utils/iconMap';
 
 interface GoalCardProps {
@@ -10,9 +11,14 @@ interface GoalCardProps {
   onDelete: () => void;
   getCompletionRate: (habitId: string, days: string[]) => number;
   latestWeight?: number;
+  /** To-dos linked to this objective (two-way with the Calendar view). */
+  todos?: Todo[];
+  onToggleTodo?: (id: string) => void;
 }
 
-const GoalCard: React.FC<GoalCardProps> = ({ goal, habits, onEdit, onDelete, getCompletionRate, latestWeight }) => {
+const GoalCard: React.FC<GoalCardProps> = ({
+  goal, habits, onEdit, onDelete, getCompletionRate, latestWeight, todos = [], onToggleTodo,
+}) => {
   const today = new Date();
   const last30Days = Array.from({ length: 30 }).map((_, i) => {
     const d = new Date(today);
@@ -21,6 +27,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, habits, onEdit, onDelete, get
   });
 
   const linkedHabits = habits.filter(h => h.goalId === goal.id);
+  const openTodos = todos.filter(t => !t.done).length;
   
   let averageRate = 0;
   if (linkedHabits.length > 0) {
@@ -126,6 +133,53 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, habits, onEdit, onDelete, get
               </span>
             ))}
           </div>
+        )}
+      </div>
+
+      {/* Linked to-dos — two-way with the Calendar view */}
+      <div className="mt-4">
+        <h4 className="text-[9px] font-bold text-zinc-500 mb-2.5 uppercase tracking-widest flex items-center justify-between">
+          <span className="inline-flex items-center gap-1.5">
+            <ListTodo className="w-3 h-3" />
+            Linked To-dos
+          </span>
+          <span className={openTodos > 0 ? 'text-amber-600 dark:text-amber-400' : ''}>
+            {todos.length === 0 ? '—' : openTodos > 0 ? `${openTodos} open` : 'all done'}
+          </span>
+        </h4>
+        {todos.length === 0 ? (
+          <p className="text-xs text-zinc-400 dark:text-zinc-600 italic">
+            No to-dos linked. Link one from the Calendar.
+          </p>
+        ) : (
+          <ul className="space-y-1.5">
+            {todos.slice(0, 4).map(t => (
+              <li key={t.id} className="flex items-start gap-2" data-goal-todo={t.id}>
+                <input
+                  type="checkbox"
+                  checked={t.done}
+                  onChange={() => onToggleTodo?.(t.id)}
+                  disabled={!onToggleTodo}
+                  className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-emerald-500 cursor-pointer"
+                />
+                <span
+                  className={`flex-1 text-xs break-words ${
+                    t.done
+                      ? 'line-through text-zinc-400 dark:text-zinc-600'
+                      : 'text-zinc-700 dark:text-zinc-300'
+                  }`}
+                >
+                  {t.text}
+                </span>
+                <span className="flex-shrink-0 text-[10px] text-zinc-400 dark:text-zinc-600 tabular-nums">
+                  {new Date(t.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                </span>
+              </li>
+            ))}
+            {todos.length > 4 && (
+              <li className="text-[10px] text-zinc-500 pl-5">+{todos.length - 4} more</li>
+            )}
+          </ul>
         )}
       </div>
     </div>

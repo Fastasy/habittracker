@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { Target, Plus } from 'lucide-react';
 import { Goal, Habit } from '../../types/habit';
+import { Todo } from '../../types/calendar';
 import GoalCard from './GoalCard';
 import GoalModal from './GoalModal';
 
 interface GoalsViewProps {
   goals: Goal[];
   habits: Habit[];
+  todos: Todo[];
   onAddGoal: (goal: Omit<Goal, 'id' | 'createdAt'>) => Goal;
   onUpdateGoal: (id: string, updates: Partial<Omit<Goal, 'id' | 'createdAt'>>) => void;
   onDeleteGoal: (id: string) => void;
   setHabitGoal: (habitId: string, goalId?: string) => void;
+  onToggleTodo: (id: string) => void;
+  onClearGoalTodoLinks: (goalId: string) => void;
   getCompletionRate: (habitId: string, days: string[]) => number;
   latestWeight?: number;
 }
@@ -18,10 +22,13 @@ interface GoalsViewProps {
 const GoalsView: React.FC<GoalsViewProps> = ({
   goals,
   habits,
+  todos,
   onAddGoal,
   onUpdateGoal,
   onDeleteGoal,
   setHabitGoal,
+  onToggleTodo,
+  onClearGoalTodoLinks,
   getCompletionRate,
   latestWeight
 }) => {
@@ -66,6 +73,9 @@ const GoalsView: React.FC<GoalsViewProps> = ({
           setHabitGoal(h.id, undefined);
         }
       });
+      // The DB clears todos.goal_id via `on delete set null`; mirror it locally
+      // so the Calendar doesn't show a link to an objective that no longer exists.
+      onClearGoalTodoLinks(id);
     }
   };
 
@@ -113,6 +123,8 @@ const GoalsView: React.FC<GoalsViewProps> = ({
               key={goal.id}
               goal={goal}
               habits={habits}
+              todos={todos.filter(t => t.goalId === goal.id)}
+              onToggleTodo={onToggleTodo}
               getCompletionRate={getCompletionRate}
               latestWeight={latestWeight}
               onEdit={() => handleOpenModal(goal)}

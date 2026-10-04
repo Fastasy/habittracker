@@ -15,6 +15,7 @@ import PasscodeView from './components/Auth/PasscodeView';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useGoals } from './hooks/useGoals';
 import { useWeight } from './hooks/useWeight';
+import { useCalendar } from './hooks/useCalendar';
 
 /**
  * Data hooks live here, INSIDE the auth gate.
@@ -49,6 +50,10 @@ const AuthenticatedApp: React.FC = () => {
 
   const { goals, addGoal, updateGoal, deleteGoal } = useGoals();
   const { logWeight, getWeightLog, getWeightLogs, logs: weightLogs } = useWeight();
+  // Owned here (not inside CalendarView) so the Calendar and the Objective
+  // cards read and write ONE list — ticking a linked to-do in either place
+  // updates both immediately.
+  const calendar = useCalendar();
 
   // Compute latest weight for GoalsView
   const latestWeight = React.useMemo(() => {
@@ -79,7 +84,7 @@ const AuthenticatedApp: React.FC = () => {
               getStreak={getStreak}
             />
           )}
-          {currentView === 'calendar' && <CalendarView />}
+          {currentView === 'calendar' && <CalendarView calendar={calendar} goals={goals} />}
           {currentView === 'habits' && (
             <HabitsView
               habits={habits}
@@ -95,10 +100,13 @@ const AuthenticatedApp: React.FC = () => {
             <GoalsView
               goals={goals}
               habits={habits}
+              todos={calendar.todos}
               onAddGoal={addGoal}
               onUpdateGoal={updateGoal}
               onDeleteGoal={deleteGoal}
               setHabitGoal={setHabitGoal}
+              onToggleTodo={calendar.toggleTodo}
+              onClearGoalTodoLinks={calendar.clearGoalLinks}
               getCompletionRate={getCompletionRate}
               latestWeight={latestWeight}
             />

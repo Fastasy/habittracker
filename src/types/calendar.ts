@@ -8,4 +8,6 @@ export interface Todo {
   date: string; // YYYY-MM-DD
   text: string;
   done: boolean;
+  /** Optional link to a goal (mirrors Habit.goalId). */
+  goalId?: string;
 }
