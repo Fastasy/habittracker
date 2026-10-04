@@ -5,6 +5,7 @@ import { ViewType } from './types/habit';
 import Sidebar from './components/Layout/Sidebar';
 import MobileNav from './components/Layout/MobileNav';
 import TodayView from './components/Today/TodayView';
+import CalendarView from './components/Calendar/CalendarView';
 import HabitsView from './components/Habits/HabitsView';
 import AnalyticsView from './components/Analytics/AnalyticsView';
 import SettingsView from './components/Settings/SettingsView';
@@ -78,6 +79,7 @@ const AuthenticatedApp: React.FC = () => {
               getStreak={getStreak}
             />
           )}
+          {currentView === 'calendar' && <CalendarView />}
           {currentView === 'habits' && (
             <HabitsView
               habits={habits}
