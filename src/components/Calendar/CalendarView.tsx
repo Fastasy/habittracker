@@ -8,6 +8,8 @@ import {
   StickyNote,
   Loader2,
   Target,
+  Undo2,
+  ArrowRight,
 } from 'lucide-react';
 import {
   addMonths,
@@ -24,6 +26,7 @@ import {
 import { CalendarApi } from '../../hooks/useCalendar';
 import { Goal } from '../../types/habit';
 import { toDateString } from '../../utils/dateUtils';
+import { isMissed, isCarriedIn, carriedDays, shortDate } from '../../utils/todoUtils';
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -46,6 +49,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
     todosFor,
     openCount,
     doneCount,
+    missedCount,
     noteFor,
   } = calendar;
 
@@ -91,9 +95,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
     return eachDayOfInterval({ start, end });
   }, [month]);
 
+  // "Open" only counts days that can still be acted on; anything left undone on
+  // a day that has passed is "missed" instead — the two are never the same to-do.
   const monthOpen = useMemo(
-    () => calendar.todos.filter(t => !t.done && isSameMonth(parseISO(t.date), month)).length,
-    [calendar.todos, month]
+    () => calendar.todos.filter(t => !t.done && t.date >= todayIso && isSameMonth(parseISO(t.date), month)).length,
+    [calendar.todos, month, todayIso]
+  );
+  const monthMissed = useMemo(
+    () => calendar.todos.filter(t => !t.done && t.date < todayIso && isSameMonth(parseISO(t.date), month)).length,
+    [calendar.todos, month, todayIso]
   );
 
   const goalById = (id?: string) => (id ? goals.find(g => g.id === id) : undefined);
@@ -118,6 +128,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
   const dayTodos = todosFor(selected);
   const open = openCount(selected);
   const done = doneCount(selected);
+  const missed = missedCount(selected);
+  const isPast = selected < todayIso;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pt-4 pb-20">
@@ -125,7 +137,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
       <div className="border-b border-zinc-200 dark:border-zinc-800/80 pb-6">
         <h2 className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">Calendar</h2>
         <p className="text-sm text-zinc-500 tracking-wide mt-1">
-          A to-do list and a note for every day. Link a to-do to an objective when it counts toward one.
+          A to-do list and a note for every day. Anything left undone rolls onto the next day you open.
         </p>
       </div>
 
@@ -163,8 +175,19 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
 
         <div className="flex-1" />
 
-        <span className="text-xs text-zinc-500 tracking-wide">
-          {monthOpen > 0 ? `${monthOpen} open this month` : 'Nothing open this month'}
+        <span className="text-xs tracking-wide">
+          {monthOpen > 0 && (
+            <span className="text-zinc-500">
+              {monthOpen} open{monthMissed > 0 ? ' · ' : ''}
+            </span>
+          )}
+          {monthMissed > 0 ? (
+            <span className="text-red-500">
+              {monthMissed} missed
+            </span>
+          ) : (
+            monthOpen === 0 && <span className="text-zinc-500">Nothing open this month</span>
+          )}
         </span>
       </div>
 
@@ -201,6 +224,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
               const isTd = isToday(day);
               const openN = openCount(iso);
               const doneN = doneCount(iso);
+              const missedN = missedCount(iso);
               const hasNote = !!noteFor(iso);
 
               return (
@@ -227,10 +251,18 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                   </span>
 
                   <div className="flex flex-wrap gap-1">
-                    {openN > 0 && (
-                      <span className="text-[10px] leading-none px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium">
-                        {openN}
+                    {/* A day that has passed shows what was MISSED, never "open" */}
+                    {missedN > 0 ? (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] leading-none px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-500 border border-red-500/25 font-medium">
+                        <X className="w-2.5 h-2.5" strokeWidth={3} />
+                        {missedN}
                       </span>
+                    ) : (
+                      openN > 0 && (
+                        <span className="text-[10px] leading-none px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium">
+                          {openN}
+                        </span>
+                      )
                     )}
                     {doneN > 0 && (
                       <span className="inline-flex items-center gap-0.5 text-[10px] leading-none px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
@@ -268,8 +300,22 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
               {/* To-do list */}
               <div className="mt-5 flex items-center justify-between">
                 <b className="text-xs font-bold uppercase tracking-widest text-zinc-500">To-do list</b>
-                <span className="text-[10px] uppercase tracking-widest text-zinc-500">
-                  {open > 0 ? `${open} open` : done > 0 ? 'all done' : '—'}
+                <span
+                  className={`text-[10px] uppercase tracking-widest ${
+                    isPast && missed > 0 ? 'text-red-500 font-bold' : 'text-zinc-500'
+                  }`}
+                >
+                  {isPast
+                    ? missed > 0
+                      ? `${missed} missed`
+                      : done > 0
+                        ? 'all done'
+                        : '—'
+                    : open > 0
+                      ? `${open} open`
+                      : done > 0
+                        ? 'all done'
+                        : '—'}
                 </span>
               </div>
 
@@ -312,21 +358,42 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                 <ul className="mt-3 divide-y divide-dashed divide-zinc-200 dark:divide-zinc-800">
                   {dayTodos.map(t => {
                     const g = goalById(t.goalId);
+                    const missed = isMissed(t, todayIso);
+                    const carriedIn = isCarriedIn(t);
+                    const overdue = carriedDays(t);
                     return (
                       <li key={t.id} className="py-2">
                         <div className="flex items-start gap-3 group">
-                          <input
-                            type="checkbox"
-                            checked={t.done}
-                            onChange={() => toggleTodo(t.id)}
-                            className="mt-0.5 w-4 h-4 flex-shrink-0 accent-emerald-500 cursor-pointer"
-                          />
+                          {/* Three states: green check (done), red X (the day
+                              ended and it was not done), empty box (still open).
+                              The red X is still a button — clicking it marks the
+                              to-do done after the fact. */}
+                          {missed ? (
+                            <button
+                              onClick={() => toggleTodo(t.id)}
+                              data-todo-missed={t.id}
+                              aria-label="Not completed — mark as done"
+                              title={`Not done on ${shortDate(t.date)} — click to mark it done`}
+                              className="mt-0.5 w-4 h-4 flex-shrink-0 rounded border border-red-500/60 bg-red-500/15 text-red-500 flex items-center justify-center hover:bg-red-500/25 transition-colors"
+                            >
+                              <X className="w-2.5 h-2.5" strokeWidth={3} />
+                            </button>
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={t.done}
+                              onChange={() => toggleTodo(t.id)}
+                              className="mt-0.5 w-4 h-4 flex-shrink-0 accent-emerald-500 cursor-pointer"
+                            />
+                          )}
                           <button
                             onClick={() => toggleTodo(t.id)}
                             className={`flex-1 text-left text-sm break-words transition-colors ${
                               t.done
                                 ? 'line-through text-zinc-400 dark:text-zinc-600'
-                                : 'text-zinc-800 dark:text-zinc-200 hover:text-emerald-600 dark:hover:text-emerald-400'
+                                : missed
+                                  ? 'line-through text-red-500/75 dark:text-red-400/60'
+                                  : 'text-zinc-800 dark:text-zinc-200 hover:text-emerald-600 dark:hover:text-emerald-400'
                             }`}
                           >
                             {t.text}
@@ -340,8 +407,34 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                           </button>
                         </div>
 
-                        {/* Goal link — chip when set, an explicit picker while editing */}
-                        <div className="ml-7 mt-1.5">
+                        {/* Roll-over history + goal link */}
+                        <div className="ml-7 mt-1.5 flex flex-wrap items-center gap-1">
+                          {/* The accountability chip is for work that is STILL
+                              owed. Once it is done the miss stays recorded on
+                              the day it was missed (red X + "rolled to …"), so
+                              the chip stops nagging here. */}
+                          {carriedIn && !t.done && (
+                            <span
+                              data-carry-in={t.id}
+                              title={`Not completed on ${shortDate(t.carriedFrom!)} — rolled over to this day`}
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-[10px] font-medium text-amber-600 dark:text-amber-400"
+                            >
+                              <Undo2 className="w-2.5 h-2.5" />
+                              {`not done ${shortDate(t.carriedFrom!)}`}
+                              {overdue > 1 ? ` · ${overdue}d` : ''}
+                            </span>
+                          )}
+                          {!t.done && t.carriedTo && (
+                            <span
+                              data-carry-out={t.id}
+                              title={`Rolled over to ${shortDate(t.carriedTo)}`}
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 text-[10px] text-zinc-500 dark:text-zinc-400"
+                            >
+                              <ArrowRight className="w-2.5 h-2.5" />
+                              {`rolled to ${shortDate(t.carriedTo)}`}
+                            </span>
+                          )}
+
                           {linkEditId === t.id ? (
                             <select
                               autoFocus

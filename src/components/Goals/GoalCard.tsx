@@ -1,8 +1,10 @@
 import React from 'react';
-import { Calendar, Edit2, Trash2, Crosshair, ListTodo } from 'lucide-react';
+import { Calendar, Edit2, Trash2, Crosshair, ListTodo, Undo2, X } from 'lucide-react';
 import { Goal, Habit, StreakInfo } from '../../types/habit';
 import { Todo } from '../../types/calendar';
 import { emojiToIcon } from '../../utils/iconMap';
+import { toDateString } from '../../utils/dateUtils';
+import { isMissed, isCarriedIn, shortDate } from '../../utils/todoUtils';
 
 interface GoalCardProps {
   goal: Goal;
@@ -30,6 +32,8 @@ const GoalCard: React.FC<GoalCardProps> = ({
 
   const linkedHabits = habits.filter(h => h.goalId === goal.id);
   const openTodos = todos.filter(t => !t.done).length;
+  const todayIso = toDateString(new Date());
+  const missedTodos = todos.filter(t => isMissed(t, todayIso)).length;
   
   let averageRate = 0;
   if (linkedHabits.length > 0) {
@@ -151,8 +155,14 @@ const GoalCard: React.FC<GoalCardProps> = ({
             <ListTodo className="w-3 h-3" />
             Linked To-dos
           </span>
-          <span className={openTodos > 0 ? 'text-amber-600 dark:text-amber-400' : ''}>
-            {todos.length === 0 ? '—' : openTodos > 0 ? `${openTodos} open` : 'all done'}
+          <span className={missedTodos > 0 ? 'text-red-500' : openTodos > 0 ? 'text-amber-600 dark:text-amber-400' : ''}>
+            {todos.length === 0
+              ? '—'
+              : missedTodos > 0
+                ? `${openTodos} open · ${missedTodos} missed`
+                : openTodos > 0
+                  ? `${openTodos} open`
+                  : 'all done'}
           </span>
         </h4>
         {todos.length === 0 ? (
@@ -163,23 +173,49 @@ const GoalCard: React.FC<GoalCardProps> = ({
           <ul className="space-y-1.5">
             {todos.slice(0, 4).map(t => (
               <li key={t.id} className="flex items-start gap-2" data-goal-todo={t.id}>
-                <input
-                  type="checkbox"
-                  checked={t.done}
-                  onChange={() => onToggleTodo?.(t.id)}
-                  disabled={!onToggleTodo}
-                  className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-emerald-500 cursor-pointer"
-                />
+                {isMissed(t, todayIso) ? (
+                  <button
+                    onClick={() => onToggleTodo?.(t.id)}
+                    disabled={!onToggleTodo}
+                    data-goal-todo-missed={t.id}
+                    aria-label="Not completed — mark as done"
+                    title={`Not done on ${shortDate(t.date)} — click to mark it done`}
+                    className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 rounded border border-red-500/60 bg-red-500/15 text-red-500 flex items-center justify-center hover:bg-red-500/25 transition-colors disabled:opacity-50"
+                  >
+                    <X className="w-2.5 h-2.5" strokeWidth={3} />
+                  </button>
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={t.done}
+                    onChange={() => onToggleTodo?.(t.id)}
+                    disabled={!onToggleTodo}
+                    className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-emerald-500 cursor-pointer"
+                  />
+                )}
                 <span
                   className={`flex-1 text-xs break-words ${
                     t.done
                       ? 'line-through text-zinc-400 dark:text-zinc-600'
-                      : 'text-zinc-700 dark:text-zinc-300'
+                      : isMissed(t, todayIso)
+                        ? 'line-through text-red-500/75 dark:text-red-400/60'
+                        : 'text-zinc-700 dark:text-zinc-300'
                   }`}
                 >
                   {t.text}
                 </span>
-                <span className="flex-shrink-0 text-[10px] text-zinc-400 dark:text-zinc-600 tabular-nums">
+                {/* Same rule as the Calendar: the marker is for work still owed. */}
+                {isCarriedIn(t) && !t.done && (
+                  <Undo2
+                    className="w-3 h-3 flex-shrink-0 text-amber-500"
+                    aria-label={`Rolled over from ${shortDate(t.carriedFrom!)}`}
+                  />
+                )}
+                <span
+                  className={`flex-shrink-0 text-[10px] tabular-nums ${
+                    isCarriedIn(t) && !t.done ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-600'
+                  }`}
+                >
                   {new Date(t.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
                 </span>
               </li>
