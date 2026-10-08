@@ -63,14 +63,14 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
 
   if (habits.length === 0) {
     return (
-      <div className="max-w-5xl mx-auto pt-4">
-        <div className="flex items-center justify-between mb-8">
+      <div className="max-w-5xl mx-auto pt-2 md:pt-4">
+        <div className="flex items-center justify-between mb-5 md:mb-8">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">Metrics</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">Metrics</h2>
             <p className="text-sm text-zinc-500 tracking-wide mt-1">Aggregated behavioral analysis.</p>
           </div>
         </div>
-        <div className="text-center py-24 bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
+        <div className="text-center py-14 md:py-24 px-5 bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
           <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-950 rounded-lg flex items-center justify-center mx-auto mb-4 text-zinc-400 border border-zinc-200 dark:border-zinc-800">
             <BarChart3 className="w-5 h-5" />
           </div>
@@ -84,23 +84,23 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pt-4">
+    <div className="max-w-5xl mx-auto space-y-5 md:space-y-6 pt-2 md:pt-4 pb-2 md:pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">Metrics</h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 mb-2 md:mb-8">
+        <div className="min-w-0">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">Metrics</h2>
           <p className="text-sm text-zinc-500 tracking-wide mt-1">Aggregated behavioral analysis.</p>
         </div>
         {/* Date range filter */}
-        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 self-start md:self-auto">
           {FILTER_OPTIONS.map(opt => (
             <button
               key={opt.value}
               onClick={() => setDateFilter(opt.value)}
-              className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${
+              className={`min-h-[44px] md:min-h-0 px-3.5 md:py-1 rounded text-[11px] md:text-[10px] font-bold uppercase tracking-widest transition-all ${
                 dateFilter === opt.value
                   ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-700'
-                  : 'text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-transparent'
+                  : 'text-zinc-500 dark:text-zinc-500 border border-transparent'
               }`}
             >
               {opt.label}
@@ -122,7 +122,7 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       <HeatmapCalendar heatmapData={heatmapData} />
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6">
         <CompletionChart
           data={weeklyData}
           title="Completion Trend"

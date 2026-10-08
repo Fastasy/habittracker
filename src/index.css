@@ -24,6 +24,120 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ------------------------------------------------------------------ mobile shell
+
+   These are plain (unlayered) rules on purpose: they must beat any Tailwind
+   utility with the same property, so the shell padding is defined in exactly
+   one place instead of fighting `p-4 / md:p-8` in the class list. */
+
+html {
+  /* Stop iOS bumping font sizes in landscape. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  /* Kill the pull-to-refresh / rubber-band fight on a fixed-toolbar layout. */
+  overscroll-behavior-y: none;
+}
+
+/* The main scroll container: clears the fixed top bar and the bottom tab bar,
+   both of which grow by the device's safe-area insets. */
+.app-main {
+  padding: 1rem;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 4rem);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.75rem);
+}
+
+/* Fixed top bar (notch side). */
+.safe-top-bar {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+}
+
+/* Bottom-anchored sheet / tab bar (home-indicator side). */
+.safe-bottom-sheet {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    padding: 0 2rem;
+  }
+}
+
+/* Touch behaviour ---------------------------------------------------------- */
+
+button,
+a,
+[role="button"],
+label,
+summary,
+input[type="checkbox"],
+input[type="radio"] {
+  /* Removes the ~300ms double-tap-zoom delay on every control. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (pointer: coarse) {
+  /* A hover-revealed control cannot be reached with a thumb. Anything that
+     hid itself behind group-hover is forced visible on touch devices;
+     components also add their own always-visible affordance. */
+  .hover-reveal {
+    opacity: 1 !important;
+  }
+}
+
+/* iOS Safari zooms the entire page when a focused field's text is under 16px,
+   and never zooms back out. Force 16px on real inputs below the desktop shell. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* A range input is only tappable across its own box, so the discipline slider
+   is 44px tall on every device. The rail is drawn by the pseudo-elements
+   instead of the element background — an 8px track sized off `h-2` was an 8px
+   touch target, and `appearance: none` with no thumb rules renders a bare
+   thumb with no rail at all. */
+.range-thin {
+  height: 44px;
+  background: transparent;
+}
+.range-thin::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: #e4e4e7; /* zinc-200 */
+}
+.range-thin::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -7px; /* (8 - 22) / 2 */
+  border-radius: 9999px;
+  background: #ef4444; /* red-500 */
+}
+.range-thin::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: #e4e4e7;
+}
+.range-thin::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 9999px;
+  background: #ef4444;
+}
+.dark .range-thin::-webkit-slider-runnable-track,
+.dark .range-thin::-moz-range-track {
+  background: #3f3f46; /* zinc-700 */
+}
+
 /* Smooth scrollbar hide */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -50,6 +164,12 @@ body {
   opacity: 0.08;
 }
 
+/* Recharts renders a wrapping div with a fixed inline height; keep the chart
+   from ever forcing the page wider than the phone. */
+.recharts-responsive-container {
+  min-width: 0;
+}
+
 /* Transitions - Linear, snappy */
 * {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -71,6 +191,15 @@ body {
     radial-gradient(1100px 520px at 12% -12%, rgba(99, 102, 241, 0.07), transparent 60%),
     radial-gradient(900px 480px at 98% 0%, rgba(16, 185, 129, 0.06), transparent 55%);
   background-attachment: fixed;
+}
+
+/* `background-attachment: fixed` repaints on every scroll frame and stutters
+   (or is ignored entirely) on mobile Safari/Chrome. Let it scroll. */
+@media (max-width: 767px) {
+  body,
+  .dark body {
+    background-attachment: scroll;
+  }
 }
 
 /* XP bars and level rings get a soft glow so progress reads as energy. */
@@ -102,6 +231,13 @@ body {
 
 .board-clear { animation: board-clear 3.2s ease-in-out infinite; }
 
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.animate-sheet-up { animation: sheet-up 220ms cubic-bezier(0.32, 0.72, 0, 1); }
+
 @media (prefers-reduced-motion: reduce) {
-  .xp-shimmer::after, .rank-pulse, .board-clear { animation: none; }
+  .xp-shimmer::after, .rank-pulse, .board-clear, .animate-sheet-up { animation: none; }
 }

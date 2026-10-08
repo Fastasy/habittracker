@@ -28,14 +28,14 @@ const MomentumChart: React.FC<MomentumChartProps> = ({ data }) => {
 
   return (
     <div className="w-full bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-1.5">
-          <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Momentum Growth Curve</h3>
+      <div className="flex items-center justify-between gap-2 mb-3 md:mb-4">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <h3 className="text-[11px] md:text-[10px] font-bold uppercase tracking-widest text-zinc-500">Momentum Growth Curve</h3>
           <InfoTooltip text="Visualizes your compound growth over the last 30 days. Watch out for red drops when a streak breaks!" />
         </div>
-        <span className="text-[9px] uppercase tracking-widest text-zinc-400">Last 30 Days</span>
+        <span className="text-[10px] uppercase tracking-widest text-zinc-400 whitespace-nowrap">Last 30 Days</span>
       </div>
-      <div className="relative w-full aspect-[4/1] min-h-[120px]">
+      <div className="relative w-full aspect-[4/1] min-h-[110px] md:min-h-[120px]">
         <svg 
           viewBox={`0 0 ${width} ${height}`} 
           className="w-full h-full overflow-visible drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]"

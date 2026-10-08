@@ -37,7 +37,7 @@ const CustomTooltip: React.FC<{
 
 const DailyBarChart: React.FC<DailyBarChartProps> = ({ data, title }) => {
   return (
-    <div className="bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900 p-6">
+    <div className="bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-900 p-4 md:p-6">
       <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">{title}</h3>
       <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Daily completion rate</p>
       <div className="h-48">

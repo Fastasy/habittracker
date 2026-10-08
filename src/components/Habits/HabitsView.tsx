@@ -51,27 +51,27 @@ const HabitsView: React.FC<HabitsViewProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto pt-4">
+    <div className="max-w-5xl mx-auto pt-2 md:pt-4 pb-2 md:pb-20">
       {/* Header */}
-      <div className="flex items-end justify-between mb-8">
-        <div>
-          <h2 className="text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">Quest Log</h2>
+      <div className="flex items-end justify-between gap-3 mb-5 md:mb-8">
+        <div className="min-w-0">
+          <h2 className="text-2xl md:text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">Quest Log</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-500 tracking-wide mt-1">
             {habits.length === 0 ? 'No quests configured' : `${habits.length} quest${habits.length !== 1 ? 's' : ''} active`}
           </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-sm"
+          className="flex-shrink-0 flex items-center gap-2 min-h-[44px] px-3.5 md:px-4 bg-zinc-900 dark:bg-white active:bg-zinc-800 dark:active:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-sm"
         >
           <Plus className="w-4 h-4" />
-          <span className="hidden sm:block">New Quest</span>
+          <span>New Quest</span>
         </button>
       </div>
 
       {/* Empty state */}
       {habits.length === 0 && (
-        <div className="text-center py-20 px-6 border border-dashed border-zinc-300 dark:border-zinc-800/80 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20">
+        <div className="text-center py-12 px-5 md:py-20 md:px-6 border border-dashed border-zinc-300 dark:border-zinc-800/80 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20">
           <div className="w-16 h-16 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center mx-auto mb-5 text-zinc-400">
             <LayoutList className="w-8 h-8 stroke-[1.5]" />
           </div>
@@ -81,9 +81,9 @@ const HabitsView: React.FC<HabitsViewProps> = ({
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-xs uppercase tracking-wider"
+            className="inline-flex items-center gap-2 min-h-[44px] px-4 bg-zinc-900 dark:bg-white active:bg-zinc-800 dark:active:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-xs uppercase tracking-wider"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-4 h-4" />
             Create Quest
           </button>
         </div>
@@ -91,7 +91,7 @@ const HabitsView: React.FC<HabitsViewProps> = ({
 
       {/* Habit grid */}
       {habits.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-4">
           {habits.map(habit => (
             <HabitCard
               key={habit.id}

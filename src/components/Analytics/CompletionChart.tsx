@@ -33,10 +33,10 @@ const CustomTooltip: React.FC<{ active?: boolean; payload?: { value: number }[];
 
 const CompletionChart: React.FC<CompletionChartProps> = ({ data, title, subtitle }) => {
   return (
-    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
-      <div className="mb-6 flex flex-col gap-1">
+    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-4 md:p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
+      <div className="flex items-center justify-between gap-3 mb-4 md:mb-6 border-b border-zinc-200 dark:border-zinc-800/80 pb-3 md:pb-4">
         <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">{title}</h3>
-        {subtitle && <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">{subtitle}</p>}
+        {subtitle && <p className="text-[11px] md:text-[10px] font-bold uppercase tracking-widest text-zinc-500 text-right">{subtitle}</p>}
       </div>
       <div className="h-52">
         <ResponsiveContainer width="100%" height="100%">

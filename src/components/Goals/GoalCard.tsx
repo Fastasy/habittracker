@@ -46,7 +46,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
   const accentColor = goal.color?.startsWith('#') ? goal.color : '#10b981'; 
 
   return (
-    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-4 md:p-5 shadow-sm transition-all group relative overflow-hidden">
       {/* Subtle top border indicator */}
       <div 
         className="absolute top-0 left-0 right-0 h-[2px] opacity-70"
@@ -54,29 +54,30 @@ const GoalCard: React.FC<GoalCardProps> = ({
       />
       
       <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <div 
-            className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm"
+            className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0"
             style={{ backgroundColor: `${accentColor}15`, color: accentColor }}
           >
             <Crosshair className="w-5 h-5" />
           </div>
-          <div>
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide text-sm">{goal.name}</h3>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide text-sm truncate">{goal.name}</h3>
             {goal.deadline && (
-              <p className="text-[10px] text-zinc-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
+              <p className="text-[11px] text-zinc-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
                 <Calendar className="w-3 h-3" />
                 {new Date(goal.deadline).toLocaleDateString()}
               </p>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={onEdit} className="p-1.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
-            <Edit2 className="w-3.5 h-3.5" />
+        {/* Always visible — a hover-revealed control does not exist on touch. */}
+        <div className="flex items-center gap-0.5 -mt-1 -mr-1 flex-shrink-0 transition-opacity">
+          <button onClick={onEdit} aria-label={`Edit ${goal.name}`} className="w-11 h-11 flex items-center justify-center text-zinc-400 active:text-zinc-900 dark:active:text-zinc-100 active:bg-zinc-100 dark:active:bg-zinc-800 rounded-md transition-colors">
+            <Edit2 className="w-4 h-4" />
           </button>
-          <button onClick={onDelete} className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors">
-            <Trash2 className="w-3.5 h-3.5" />
+          <button onClick={onDelete} aria-label={`Delete ${goal.name}`} className="w-11 h-11 flex items-center justify-center text-zinc-400 active:text-red-500 active:bg-red-50 dark:active:bg-red-900/20 rounded-md transition-colors">
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -124,7 +125,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
       </div>
 
       <div>
-        <h4 className="text-[9px] font-bold text-zinc-500 mb-2.5 uppercase tracking-widest">Linked Quests</h4>
+        <h4 className="text-[10px] font-bold text-zinc-500 mb-2.5 uppercase tracking-widest">Linked Quests</h4>
         {linkedHabits.length === 0 ? (
           <p className="text-xs text-zinc-400 dark:text-zinc-600 italic">No quests linked.</p>
         ) : (
@@ -150,7 +151,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
 
       {/* Linked to-dos — two-way with the Calendar view */}
       <div className="mt-4">
-        <h4 className="text-[9px] font-bold text-zinc-500 mb-2.5 uppercase tracking-widest flex items-center justify-between">
+        <h4 className="text-[10px] font-bold text-zinc-500 mb-2.5 uppercase tracking-widest flex items-center justify-between gap-2">
           <span className="inline-flex items-center gap-1.5">
             <ListTodo className="w-3 h-3" />
             Linked To-dos
@@ -172,7 +173,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
         ) : (
           <ul className="space-y-1.5">
             {todos.slice(0, 4).map(t => (
-              <li key={t.id} className="flex items-start gap-2" data-goal-todo={t.id}>
+              <li key={t.id} className="flex items-start gap-1" data-goal-todo={t.id}>
                 {isMissed(t, todayIso) ? (
                   <button
                     onClick={() => onToggleTodo?.(t.id)}
@@ -180,21 +181,26 @@ const GoalCard: React.FC<GoalCardProps> = ({
                     data-goal-todo-missed={t.id}
                     aria-label="Not completed — mark as done"
                     title={`Not done on ${shortDate(t.date)} — click to mark it done`}
-                    className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 rounded border border-red-500/60 bg-red-500/15 text-red-500 flex items-center justify-center hover:bg-red-500/25 transition-colors disabled:opacity-50"
+                    className="-m-2.5 p-2.5 flex-shrink-0 flex items-center justify-center disabled:opacity-50"
                   >
-                    <X className="w-2.5 h-2.5" strokeWidth={3} />
+                    <span className="w-6 h-6 rounded-md border border-red-500/60 bg-red-500/15 text-red-500 flex items-center justify-center active:bg-red-500/25 transition-colors">
+                      <X className="w-3.5 h-3.5" strokeWidth={3} />
+                    </span>
                   </button>
                 ) : (
-                  <input
-                    type="checkbox"
-                    checked={t.done}
-                    onChange={() => onToggleTodo?.(t.id)}
-                    disabled={!onToggleTodo}
-                    className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-emerald-500 cursor-pointer"
-                  />
+                  <label className="-m-2.5 p-2.5 flex-shrink-0 flex items-center justify-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={t.done}
+                      onChange={() => onToggleTodo?.(t.id)}
+                      disabled={!onToggleTodo}
+                      aria-label={`Mark "${t.text}" as done`}
+                      className="w-6 h-6 flex-shrink-0 accent-emerald-500 cursor-pointer disabled:opacity-50"
+                    />
+                  </label>
                 )}
                 <span
-                  className={`flex-1 text-xs break-words ${
+                  className={`flex-1 min-w-0 text-xs break-words py-1.5 ${
                     t.done
                       ? 'line-through text-zinc-400 dark:text-zinc-600'
                       : isMissed(t, todayIso)
@@ -207,12 +213,12 @@ const GoalCard: React.FC<GoalCardProps> = ({
                 {/* Same rule as the Calendar: the marker is for work still owed. */}
                 {isCarriedIn(t) && !t.done && (
                   <Undo2
-                    className="w-3 h-3 flex-shrink-0 text-amber-500"
+                    className="w-4 h-4 mt-2 flex-shrink-0 text-amber-500"
                     aria-label={`Rolled over from ${shortDate(t.carriedFrom!)}`}
                   />
                 )}
                 <span
-                  className={`flex-shrink-0 text-[10px] tabular-nums ${
+                  className={`flex-shrink-0 mt-2 text-[11px] tabular-nums ${
                     isCarriedIn(t) && !t.done ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-600'
                   }`}
                 >
@@ -221,7 +227,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
               </li>
             ))}
             {todos.length > 4 && (
-              <li className="text-[10px] text-zinc-500 pl-5">+{todos.length - 4} more</li>
+              <li className="text-[11px] text-zinc-500 pl-6">+{todos.length - 4} more</li>
             )}
           </ul>
         )}

@@ -66,6 +66,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
   const [draftGoal, setDraftGoal] = useState('');
   const [linkEditId, setLinkEditId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // On a phone the day panel sits below the month grid, so selecting a day
+  // would otherwise look like nothing happened.
+  const panelRef = useRef<HTMLDivElement>(null);
 
   // Load the selected day's saved note into the editor.
   useEffect(() => {
@@ -114,6 +117,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
     setSelected(iso);
     setLinkEditId(null);
     if (!isSameMonth(parseISO(iso), month)) setMonth(startOfMonth(parseISO(iso)));
+    // Only on the stacked mobile layout — on desktop the panel is already visible.
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches) {
+      requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
   };
 
   const submitTodo = (e: React.FormEvent) => {
@@ -132,34 +139,34 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
   const isPast = selected < todayIso;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 pt-4 pb-20">
+    <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 pt-2 md:pt-4 pb-2 md:pb-20">
       {/* Header */}
-      <div className="border-b border-zinc-200 dark:border-zinc-800/80 pb-6">
-        <h2 className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">Calendar</h2>
+      <div className="border-b border-zinc-200 dark:border-zinc-800/80 pb-4 md:pb-6">
+        <h2 className="text-2xl md:text-3xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">Calendar</h2>
         <p className="text-sm text-zinc-500 tracking-wide mt-1">
           A to-do list and a note for every day. Anything left undone rolls onto the next day you open.
         </p>
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="inline-flex items-center gap-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-1">
+      <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+        <div className="flex-1 md:flex-none inline-flex items-center gap-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-1">
           <button
             onClick={() => setMonth(m => addMonths(m, -1))}
-            className="p-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="w-11 h-11 flex items-center justify-center rounded-full text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 md:hover:bg-zinc-100 md:dark:hover:bg-zinc-800 transition-colors"
             aria-label="Previous month"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <b className="min-w-[150px] text-center text-sm text-zinc-900 dark:text-zinc-100 tracking-wide">
+          <b className="flex-1 min-w-0 md:min-w-[150px] text-center text-base md:text-sm text-zinc-900 dark:text-zinc-100 tracking-wide">
             {format(month, 'MMMM yyyy')}
           </b>
           <button
             onClick={() => setMonth(m => addMonths(m, 1))}
-            className="p-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="w-11 h-11 flex items-center justify-center rounded-full text-zinc-500 active:bg-zinc-100 dark:active:bg-zinc-800 md:hover:bg-zinc-100 md:dark:hover:bg-zinc-800 transition-colors"
             aria-label="Next month"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
 
@@ -168,14 +175,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
             setMonth(startOfMonth(new Date()));
             setSelected(todayIso);
           }}
-          className="px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className="min-h-[44px] px-4 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 active:bg-zinc-100 dark:active:bg-zinc-800 md:hover:bg-zinc-100 md:dark:hover:bg-zinc-800 transition-colors"
         >
           Today
         </button>
 
-        <div className="flex-1" />
-
-        <span className="text-xs tracking-wide">
+        <span className="text-xs tracking-wide basis-full md:basis-auto">
           {monthOpen > 0 && (
             <span className="text-zinc-500">
               {monthOpen} open{monthMissed > 0 ? ' · ' : ''}
@@ -195,17 +200,17 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
       {/* `grid-cols-1` (= minmax(0,1fr)) matters: with no base column the mobile
           track is `auto`, which sizes to max-content and lets wide children push
           the whole page past the viewport. */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)] items-start">
+      <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)] items-start">
         {/* ---------------- Month grid ---------------- */}
-        <div className={`${card} p-5`}>
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">
+        <div className={`${card} p-3 md:p-5`}>
+          <h3 className="hidden md:block text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">
             {format(month, 'MMMM yyyy')}
           </h3>
-          <p className="text-xs text-zinc-500 mt-1 mb-4 tracking-wide">
+          <p className="hidden md:block text-xs text-zinc-500 mt-1 mb-4 tracking-wide">
             Click any day to open its to-dos and notes.
           </p>
 
-          <div className="grid grid-cols-7 gap-1.5 mb-1.5">
+          <div className="grid grid-cols-7 gap-1 md:gap-1.5 mb-1">
             {WEEKDAYS.map(d => (
               <div
                 key={d}
@@ -216,7 +221,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1.5">
+          <div className="grid grid-cols-7 gap-1 md:gap-1.5">
             {days.map(day => {
               const iso = toDateString(day);
               const inMonth = isSameMonth(day, month);
@@ -232,41 +237,42 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                   key={iso}
                   onClick={() => selectDay(iso)}
                   data-day={iso}
-                  className={`min-h-[84px] min-w-0 overflow-hidden rounded-lg border p-1.5 flex flex-col gap-1 text-left transition-all ${
+                  aria-label={`${format(day, 'd MMMM yyyy')}${missedN ? `, ${missedN} missed` : openN ? `, ${openN} open` : ''}${doneN ? `, ${doneN} done` : ''}`}
+                  className={`min-h-[54px] sm:min-h-[64px] lg:min-h-[84px] min-w-0 overflow-hidden rounded-lg border p-1 md:p-1.5 flex flex-col gap-0.5 md:gap-1 text-left transition-all ${
                     inMonth
                       ? 'bg-white dark:bg-zinc-900/40 border-zinc-200 dark:border-zinc-800'
                       : 'bg-zinc-50 dark:bg-zinc-900/20 border-zinc-200/60 dark:border-zinc-800/40 opacity-45'
                   } ${
                     isSel
                       ? 'border-emerald-500 ring-1 ring-emerald-500/40'
-                      : 'hover:border-zinc-300 dark:hover:border-zinc-700'
+                      : 'md:hover:border-zinc-300 md:dark:hover:border-zinc-700'
                   }`}
                 >
                   <span
-                    className={`text-[11px] font-semibold w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 ${
+                    className={`text-[11px] font-semibold w-5 h-5 md:w-6 md:h-6 flex items-center justify-center rounded-full flex-shrink-0 ${
                       isTd ? 'bg-emerald-500 text-white' : 'text-zinc-600 dark:text-zinc-400'
                     }`}
                   >
                     {format(day, 'd')}
                   </span>
 
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-0.5 md:gap-1">
                     {/* A day that has passed shows what was MISSED, never "open" */}
                     {missedN > 0 ? (
-                      <span className="inline-flex items-center gap-0.5 text-[10px] leading-none px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-500 border border-red-500/25 font-medium">
-                        <X className="w-2.5 h-2.5" strokeWidth={3} />
+                      <span className="inline-flex items-center gap-0.5 text-[10px] leading-none px-1 py-0.5 md:px-1.5 rounded-full bg-red-500/10 text-red-500 border border-red-500/25 font-medium">
+                        <X className="hidden md:inline w-2.5 h-2.5" strokeWidth={3} />
                         {missedN}
                       </span>
                     ) : (
                       openN > 0 && (
-                        <span className="text-[10px] leading-none px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium">
+                        <span className="text-[10px] leading-none px-1 py-0.5 md:px-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium">
                           {openN}
                         </span>
                       )
                     )}
                     {doneN > 0 && (
-                      <span className="inline-flex items-center gap-0.5 text-[10px] leading-none px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
-                        <Check className="w-2.5 h-2.5" />
+                      <span className="inline-flex items-center gap-0.5 text-[10px] leading-none px-1 py-0.5 md:px-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
+                        <Check className="hidden md:inline w-2.5 h-2.5" />
                         {doneN}
                       </span>
                     )}
@@ -283,7 +289,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
         </div>
 
         {/* ---------------- Day panel ---------------- */}
-        <div className={`${card} p-5`}>
+        <div ref={panelRef} className={`${card} p-4 md:p-5 scroll-mt-20`}>
           <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">
             {format(parseISO(selected), 'EEEE, d MMMM yyyy')}
           </h3>
@@ -326,7 +332,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                   value={draft}
                   onChange={e => setDraft(e.target.value)}
                   placeholder="Add a to-do (press Enter)"
-                  className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                  className="w-full px-3 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
                 />
                 <div className="flex gap-2">
                   <select
@@ -334,7 +340,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                     onChange={e => setDraftGoal(e.target.value)}
                     disabled={goals.length === 0}
                     aria-label="Link to objective"
-                    className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 min-w-0 px-2 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">No objective</option>
                     {goals.map(g => (
@@ -346,9 +352,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                   <button
                     type="submit"
                     disabled={!draft.trim()}
-                    className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex-shrink-0 min-h-[44px] inline-flex items-center gap-1 px-4 rounded-lg bg-zinc-900 active:bg-zinc-800 dark:bg-white dark:active:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-4 h-4" />
                     Add
                   </button>
                 </div>
@@ -362,53 +368,61 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                     const carriedIn = isCarriedIn(t);
                     const overdue = carriedDays(t);
                     return (
-                      <li key={t.id} className="py-2">
-                        <div className="flex items-start gap-3 group">
+                      <li key={t.id} className="py-1">
+                        <div className="flex items-start gap-1.5 group">
                           {/* Three states: green check (done), red X (the day
                               ended and it was not done), empty box (still open).
                               The red X is still a button — clicking it marks the
-                              to-do done after the fact. */}
+                              to-do done after the fact. Both controls are
+                              padded out to a 44px hit area. */}
                           {missed ? (
                             <button
                               onClick={() => toggleTodo(t.id)}
                               data-todo-missed={t.id}
                               aria-label="Not completed — mark as done"
                               title={`Not done on ${shortDate(t.date)} — click to mark it done`}
-                              className="mt-0.5 w-4 h-4 flex-shrink-0 rounded border border-red-500/60 bg-red-500/15 text-red-500 flex items-center justify-center hover:bg-red-500/25 transition-colors"
+                              className="-m-2.5 p-2.5 flex-shrink-0 flex items-center justify-center"
                             >
-                              <X className="w-2.5 h-2.5" strokeWidth={3} />
+                              <span className="w-6 h-6 rounded-md border border-red-500/60 bg-red-500/15 text-red-500 flex items-center justify-center active:bg-red-500/25 transition-colors">
+                                <X className="w-3.5 h-3.5" strokeWidth={3} />
+                              </span>
                             </button>
                           ) : (
-                            <input
-                              type="checkbox"
-                              checked={t.done}
-                              onChange={() => toggleTodo(t.id)}
-                              className="mt-0.5 w-4 h-4 flex-shrink-0 accent-emerald-500 cursor-pointer"
-                            />
+                            <label className="-m-2.5 p-2.5 flex-shrink-0 flex items-center justify-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={t.done}
+                                onChange={() => toggleTodo(t.id)}
+                                aria-label={`Mark "${t.text}" as done`}
+                                className="w-6 h-6 accent-emerald-500 cursor-pointer"
+                              />
+                            </label>
                           )}
                           <button
                             onClick={() => toggleTodo(t.id)}
-                            className={`flex-1 text-left text-sm break-words transition-colors ${
+                            className={`flex-1 min-w-0 min-h-[44px] text-left text-sm break-words py-1.5 transition-colors ${
                               t.done
                                 ? 'line-through text-zinc-400 dark:text-zinc-600'
                                 : missed
                                   ? 'line-through text-red-500/75 dark:text-red-400/60'
-                                  : 'text-zinc-800 dark:text-zinc-200 hover:text-emerald-600 dark:hover:text-emerald-400'
+                                  : 'text-zinc-800 dark:text-zinc-200'
                             }`}
                           >
                             {t.text}
                           </button>
+                          {/* Always visible: a hover-revealed control simply does
+                              not exist on a touch screen. */}
                           <button
                             onClick={() => deleteTodo(t.id)}
                             aria-label="Delete to-do"
-                            className="flex-shrink-0 p-1 rounded-md text-zinc-300 dark:text-zinc-700 opacity-0 group-hover:opacity-100 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+                            className="mt-0.5 flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-lg text-zinc-300 dark:text-zinc-600 active:text-red-500 active:bg-red-50 dark:active:bg-red-500/10 md:hover:text-red-500 md:hover:bg-red-50 md:dark:hover:bg-red-500/10 transition-all"
                           >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
 
                         {/* Roll-over history + goal link */}
-                        <div className="ml-7 mt-1.5 flex flex-wrap items-center gap-1">
+                        <div className="ml-11 md:ml-7 mb-1.5 flex flex-wrap items-center gap-1">
                           {/* The accountability chip is for work that is STILL
                               owed. Once it is done the miss stays recorded on
                               the day it was missed (red X + "rolled to …"), so
@@ -419,7 +433,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                               title={`Not completed on ${shortDate(t.carriedFrom!)} — rolled over to this day`}
                               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-[10px] font-medium text-amber-600 dark:text-amber-400"
                             >
-                              <Undo2 className="w-2.5 h-2.5" />
+                              <Undo2 className="w-3 h-3" />
                               {`not done ${shortDate(t.carriedFrom!)}`}
                               {overdue > 1 ? ` · ${overdue}d` : ''}
                             </span>
@@ -430,7 +444,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                               title={`Rolled over to ${shortDate(t.carriedTo)}`}
                               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 text-[10px] text-zinc-500 dark:text-zinc-400"
                             >
-                              <ArrowRight className="w-2.5 h-2.5" />
+                              <ArrowRight className="w-3 h-3" />
                               {`rolled to ${shortDate(t.carriedTo)}`}
                             </span>
                           )}
@@ -445,7 +459,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                               }}
                               onBlur={() => setLinkEditId(null)}
                               aria-label="Link to objective"
-                              className="max-w-full px-2 py-1 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-[11px] text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                              className="max-w-full px-2 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-[11px] text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                             >
                               <option value="">No objective</option>
                               {goals.map(goal => (
@@ -459,23 +473,23 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                               onClick={() => setLinkEditId(t.id)}
                               data-goal-chip={g.id}
                               title="Change or clear the linked objective"
-                              className="inline-flex items-center gap-1 max-w-full px-1.5 py-0.5 rounded-full border text-[10px] font-medium transition-colors hover:opacity-80"
+                              className="inline-flex items-center gap-1 max-w-full min-h-[44px] px-2.5 rounded-full border text-[11px] font-medium transition-colors active:opacity-80"
                               style={{
                                 borderColor: `${g.color?.startsWith('#') ? g.color : '#10b981'}40`,
                                 backgroundColor: `${g.color?.startsWith('#') ? g.color : '#10b981'}14`,
                                 color: g.color?.startsWith('#') ? g.color : '#10b981',
                               }}
                             >
-                              <Target className="w-2.5 h-2.5 flex-shrink-0" />
+                              <Target className="w-3 h-3 flex-shrink-0" />
                               <span className="truncate">{g.name}</span>
                             </button>
                           ) : (
                             <button
                               onClick={() => setLinkEditId(t.id)}
                               title="Link this to-do to an objective"
-                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 text-[10px] text-zinc-400 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 hover:border-zinc-400 transition-colors"
+                              className="inline-flex items-center gap-1 min-h-[44px] px-2.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 text-[11px] text-zinc-400 dark:text-zinc-600 active:text-zinc-700 dark:active:text-zinc-300 transition-colors"
                             >
-                              <Plus className="w-2.5 h-2.5" />
+                              <Plus className="w-3 h-3" />
                               goal
                             </button>
                           )}

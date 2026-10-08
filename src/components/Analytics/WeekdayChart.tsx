@@ -35,11 +35,11 @@ const WeekdayChart: React.FC<WeekdayChartProps> = ({ data }) => {
   const bestDay = data.find(d => d.rate === maxRate);
 
   return (
-    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
-      <div className="flex items-start justify-between mb-6">
+    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-4 md:p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
+      <div className="flex items-start justify-between gap-3 mb-4 md:mb-6 border-b border-zinc-200 dark:border-zinc-800/80 pb-3 md:pb-4">
         <div className="flex flex-col gap-1">
           <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Day Distribution</h3>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Adherence by day of week</p>
+          <p className="text-[11px] md:text-[10px] font-bold uppercase tracking-widest text-zinc-500">Adherence by day of week</p>
         </div>
         {bestDay && bestDay.rate > 0 && (
           <div className="text-right flex flex-col gap-1">

@@ -51,9 +51,9 @@ const HabitBreakdown: React.FC<HabitBreakdownProps> = ({
   })).sort((a, b) => b.rate - a.rate);
 
   return (
-    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 p-6 shadow-sm">
-      <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide mb-6">Component Analysis</h3>
-      <div className="space-y-3">
+    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 p-4 md:p-6 shadow-sm">
+      <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide mb-4 md:mb-6">Component Analysis</h3>
+      <div className="space-y-2.5 md:space-y-3">
         {habitsWithStats.map(({ habit, streak, rate, trend }) => {
           // Normalize color to new system or use a fallback
           const accentColor = habit.color?.startsWith('#') ? habit.color : '#10b981';
@@ -61,7 +61,7 @@ const HabitBreakdown: React.FC<HabitBreakdownProps> = ({
           return (
             <div
               key={habit.id}
-              className="flex items-center gap-4 p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group"
+              className="flex items-center gap-3 md:gap-4 p-3 md:p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 transition-colors group"
             >
               {/* Icon */}
               <div
@@ -80,7 +80,7 @@ const HabitBreakdown: React.FC<HabitBreakdownProps> = ({
                       style={{ width: `${rate}%`, backgroundColor: accentColor }}
                     />
                   </div>
-                  <span className="text-[10px] font-bold w-8 text-right flex-shrink-0" style={{ color: accentColor }}>
+                  <span className="text-[11px] font-bold w-9 text-right flex-shrink-0" style={{ color: accentColor }}>
                     {rate}%
                   </span>
                 </div>

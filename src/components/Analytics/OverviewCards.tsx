@@ -15,14 +15,14 @@ const StatCard: React.FC<{
   value: string | number;
   sub?: string;
 }> = ({ icon, label, value, sub }) => (
-  <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-5 border border-zinc-200 dark:border-zinc-800/80 shadow-sm relative overflow-hidden group hover:border-emerald-500/30 transition-all">
-    <div className="relative z-10 flex items-start justify-between">
-      <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">{label}</p>
-        <p className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{value}</p>
-        {sub && <p className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest mt-2">{sub}</p>}
+  <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-3.5 md:p-5 border border-zinc-200 dark:border-zinc-800/80 shadow-sm relative overflow-hidden group transition-all">
+    <div className="relative z-10 flex items-start justify-between gap-2">
+      <div className="min-w-0">
+        <p className="text-[11px] md:text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 md:mb-2">{label}</p>
+        <p className="text-2xl md:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{value}</p>
+        {sub && <p className="text-[11px] md:text-[10px] font-semibold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest mt-1.5 md:mt-2">{sub}</p>}
       </div>
-      <div className="text-zinc-400 dark:text-zinc-600 group-hover:text-emerald-500 transition-colors">
+      <div className="text-zinc-400 dark:text-zinc-600 group-hover:text-emerald-500 transition-colors flex-shrink-0 hidden sm:block">
         {icon}
       </div>
     </div>
@@ -40,7 +40,7 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({
   totalCheckIns,
 }) => {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
       <StatCard
         icon={<Target className="w-5 h-5" />}
         label="Active Routines"

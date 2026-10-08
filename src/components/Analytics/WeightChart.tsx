@@ -23,7 +23,7 @@ const WeightChart: React.FC<WeightChartProps> = ({ data }) => {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center opacity-50">
         <Activity className="w-6 h-6 text-zinc-500 mb-2" />
-        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">No telemetry available</p>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">No telemetry available</p>
       </div>
     );
   }

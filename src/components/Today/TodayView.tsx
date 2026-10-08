@@ -121,13 +121,13 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
-      className="max-w-6xl mx-auto pt-4 pb-20 space-y-6">
+      className="max-w-6xl mx-auto pt-2 md:pt-4 pb-2 md:pb-20 space-y-5 md:space-y-6">
 
       {/* ---- Header ---- */}
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">{dayLabel}</h2>
+      <div className="flex items-end justify-between gap-3 flex-wrap">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5 mb-1 flex-wrap">
+            <h2 className="text-2xl md:text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">{dayLabel}</h2>
             {isTodaySelected && (
               <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest rounded-md">
                 Active
@@ -137,21 +137,21 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
           <p className="text-sm text-zinc-500 tracking-wide">{dateLabel}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={handleExport} className="mr-2 p-2 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-800 transition-all flex items-center gap-2 text-xs font-semibold tracking-wide">
-            <Copy className="w-3.5 h-3.5" />
+          <button onClick={handleExport} aria-label="Copy daily log" className="md:mr-2 min-h-[44px] min-w-[44px] px-3 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 active:text-emerald-600 dark:active:text-emerald-400 transition-all flex items-center gap-2 text-xs font-semibold tracking-wide">
+            <Copy className="w-4 h-4" />
             <span className="hidden sm:inline">Export</span>
           </button>
-          <button onClick={goBack} className="p-2 rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all active:scale-95">
-            <ChevronLeft className="w-4 h-4" />
+          <button onClick={goBack} aria-label="Previous day" className="w-11 h-11 flex items-center justify-center rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 active:scale-95 transition-all">
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <button onClick={goForward} disabled={isTodaySelected} className="p-2 rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed">
-            <ChevronRight className="w-4 h-4" />
+          <button onClick={goForward} disabled={isTodaySelected} aria-label="Next day" className="w-11 h-11 flex items-center justify-center rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {/* ---- Date pills ---- */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+      <div className="flex gap-2 overflow-x-auto pb-2 pr-1 scrollbar-hide snap-x">
         {recentDays.map((day, i) => {
           const ds = toDateString(day);
           const isSelected = ds === dateStr;
@@ -181,46 +181,46 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
       {/* `grid-cols-1` (= minmax(0,1fr)) matters: with no base column the mobile
           track is `auto`, which sizes to max-content and forces the page wider
           than the viewport. */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] items-start">
+      <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] items-start">
         {/* ================= LEFT ================= */}
-        <div className="space-y-6">
+        <div className="space-y-5 md:space-y-6">
           {/* ---- QUEST BOARD HERO ---- */}
-          <div className={`${card} relative overflow-hidden p-6`}>
+          <div className={`${card} relative overflow-hidden p-4 md:p-6`}>
             <div className="absolute inset-0 opacity-[0.08] pointer-events-none"
               style={{ background: `radial-gradient(90% 120% at 100% 0%, ${allDone ? '#34d399' : '#a78bfa'}, transparent 65%)` }} />
-            <div className="relative flex items-center gap-6 flex-wrap">
-              <div className="relative flex-shrink-0" style={{ width: 128, height: 128 }}>
-                <svg width={128} height={128} className="-rotate-90">
+            <div className="relative flex items-center gap-4 md:gap-6">
+              <div className="relative flex-shrink-0 w-[92px] h-[92px] md:w-32 md:h-32">
+                <svg viewBox="0 0 128 128" className="w-full h-full -rotate-90">
                   <circle cx={64} cy={64} r={R} fill="none" stroke="rgba(113,113,122,0.25)" strokeWidth={STROKE} />
                   <circle cx={64} cy={64} r={R} fill="none" stroke={allDone ? '#34d399' : '#a78bfa'} strokeWidth={STROKE}
                     strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - ringPct)}
                     style={{ transition: 'stroke-dashoffset 700ms cubic-bezier(0.4,0,0.2,1)' }} />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-3xl font-bold text-zinc-900 dark:text-white tabular-nums leading-none">{completedCount}</span>
+                  <span className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white tabular-nums leading-none">{completedCount}</span>
                   <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-1">of {totalCount}</span>
                 </div>
               </div>
 
-              <div className="flex-1 min-w-[180px]">
+              <div className="flex-1 min-w-[150px]">
                 <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500">
                   {isTodaySelected ? "Today's Board" : `${format(selectedDate, 'EEEE')}'s Board`}
                 </p>
-                <h3 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
+                <h3 className="mt-1 text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
                   {totalCount === 0 ? 'Nothing scheduled'
                     : allDone ? 'Board cleared 🎉'
                     : `${totalCount - completedCount} quest${totalCount - completedCount === 1 ? '' : 's'} remaining`}
                 </h3>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                <div className="mt-3 md:mt-4 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] font-bold text-amber-600 dark:text-amber-400">
                     <Swords className="w-3.5 h-3.5" /> +{boardXp} XP banked
                   </span>
                   {stats.bestCombo >= 2 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-500/10 border border-orange-500/25 text-[11px] font-bold text-orange-600 dark:text-orange-400">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/25 text-[11px] font-bold text-orange-600 dark:text-orange-400">
                       <Flame className="w-3.5 h-3.5" /> ×{comboMult} combo
                     </span>
                   )}
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 text-[11px] font-bold text-zinc-600 dark:text-zinc-300">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 text-[11px] font-bold text-zinc-600 dark:text-zinc-300">
                     <Trophy className="w-3.5 h-3.5" /> {stats.totalXp} XP total
                   </span>
                 </div>
@@ -267,7 +267,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
 
             {scheduledHabits.length === 0 ? (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="text-center py-14 px-6 border border-dashed border-zinc-300 dark:border-zinc-800/80 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20">
+                className="text-center py-10 px-5 md:py-14 md:px-6 border border-dashed border-zinc-300 dark:border-zinc-800/80 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20">
                 {habits.length === 0 ? (
                   <>
                     <div className="w-16 h-16 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center mx-auto mb-5 text-zinc-400">
@@ -332,10 +332,10 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
         </div>
 
         {/* ================= RIGHT ================= */}
-        <div className="space-y-6">
+        <div className="space-y-5 md:space-y-6">
           {/* Progress card */}
           {totalCount > 0 && (
-            <div className={`${card} p-5`}>
+            <div className={`${card} p-4 md:p-5`}>
               <div className="flex items-end justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${allDone ? 'bg-emerald-500 text-white' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}`}>
@@ -404,7 +404,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
 
           {/* Next badges */}
           {nextBadges.length > 0 && (
-            <div className={`${card} p-5`}>
+            <div className={`${card} p-4 md:p-5`}>
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Next Unlocks</h3>
               <ul className="space-y-3">
                 {nextBadges.map(a => {
@@ -435,7 +435,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
 
           {/* Value tracker */}
           {valueConfig.active && (
-            <div className={`${card} p-5`}>
+            <div className={`${card} p-4 md:p-5`}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center border border-emerald-200 dark:border-emerald-500/30">
                   <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -465,7 +465,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
 
           {/* Pillars */}
           {pillarStats.length > 0 && (
-            <div className={`${card} p-5`}>
+            <div className={`${card} p-4 md:p-5`}>
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Domains</h3>
               <div className="space-y-3">
                 {pillarStats.map(p => (

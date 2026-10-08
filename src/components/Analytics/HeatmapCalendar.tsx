@@ -50,14 +50,15 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
-      <div className="flex items-center gap-2 mb-6 border-b border-zinc-200 dark:border-zinc-800/80 pb-4">
+    <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-4 md:p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
+      <div className="flex items-center gap-2 mb-4 md:mb-6 border-b border-zinc-200 dark:border-zinc-800/80 pb-3 md:pb-4">
         <Activity className="w-4 h-4 text-emerald-500" />
         <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">12-Month Activity Matrix</h3>
         <InfoTooltip text="Visual representation of your daily habit completion rate over the last 12 months." />
       </div>
-      
-      <div className="overflow-x-auto scrollbar-hide">
+
+      {/* Bleeds to the card edge so the horizontal swipe starts at the content */}
+      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
         <div className="min-w-max">
           {/* Month labels */}
           <div className="flex ml-8 mb-2">
@@ -81,7 +82,7 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
             <div className="flex flex-col gap-[3px] mr-2">
               {DAY_LABELS.map((label, i) => (
                 <div key={i} className="h-[14px] flex items-center">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-600 w-6 text-right leading-none">{label}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-600 w-6 text-right leading-none">{label}</span>
                 </div>
               ))}
             </div>
@@ -117,21 +118,24 @@ const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({ heatmapData }) => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-3 mt-6 justify-end">
-        <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">Less</span>
-        <div className="flex gap-[3px]">
-          {[0, 0.25, 0.5, 0.75, 1].map((v, i) => (
-            <div
-              key={i}
-              className="w-[14px] h-[14px] rounded-[3px]"
-              style={{
-                backgroundColor: getCellColor(v),
-                border: v === 0 ? '1px solid rgba(63, 63, 70, 0.2)' : 'none'
-              }}
-            />
-          ))}
+      <div className="flex items-center gap-3 mt-4 md:mt-6 justify-between md:justify-end">
+        <span className="md:hidden text-[10px] uppercase tracking-widest text-zinc-400 dark:text-zinc-600">Swipe for the full year →</span>
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">Less</span>
+          <div className="flex gap-[3px]">
+            {[0, 0.25, 0.5, 0.75, 1].map((v, i) => (
+              <div
+                key={i}
+                className="w-[14px] h-[14px] rounded-[3px]"
+                style={{
+                  backgroundColor: getCellColor(v),
+                  border: v === 0 ? '1px solid rgba(63, 63, 70, 0.2)' : 'none'
+                }}
+              />
+            ))}
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">More</span>
         </div>
-        <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">More</span>
       </div>
     </div>
   );

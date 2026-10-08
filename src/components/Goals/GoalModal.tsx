@@ -88,19 +88,19 @@ const GoalModal: React.FC<GoalModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4">
       <div className="absolute inset-0 bg-zinc-950/80 backdrop-blur-md" onClick={onClose} />
-      <div className="relative bg-zinc-50 dark:bg-zinc-950 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800/80">
+      <div className="relative bg-zinc-50 dark:bg-zinc-950 rounded-t-3xl md:rounded-xl border-t md:border border-zinc-200 dark:border-zinc-800 shadow-2xl w-full max-w-md max-h-[92dvh] md:max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between gap-2 p-4 md:p-5 border-b border-zinc-200 dark:border-zinc-800/80 shrink-0">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">
             {existingGoal ? 'Configure Objective' : 'Initialize Objective'}
           </h2>
-          <button onClick={onClose} className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-200/50 dark:hover:bg-zinc-800 transition-colors">
-            <X className="w-4 h-4" />
+          <button onClick={onClose} aria-label="Close" className="w-11 h-11 -mr-2 flex items-center justify-center rounded-md text-zinc-400 active:text-zinc-600 dark:active:text-zinc-300 active:bg-zinc-200/50 dark:active:bg-zinc-800 transition-colors">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto overflow-x-hidden">
+        <div className="p-4 md:p-6 overflow-y-auto overscroll-contain overflow-x-hidden">
           <form id="goal-form" onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Objective Title</label>
@@ -126,14 +126,16 @@ const GoalModal: React.FC<GoalModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Accent Color</label>
-              <div className="flex flex-wrap gap-2">
+              <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Accent Color</label>
+              <div className="flex flex-wrap gap-2.5">
                 {COLORS.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setColor(c)}
-                    className={`w-6 h-6 rounded-full flex items-center justify-center transition-transform hover:scale-110 border border-transparent ${
+                    aria-label={`Accent ${c}`}
+                    aria-pressed={color === c}
+                    className={`w-11 h-11 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-transform active:scale-105 border border-transparent ${
                       color === c ? 'ring-2 ring-zinc-950 dark:ring-white ring-offset-2 ring-offset-zinc-50 dark:ring-offset-zinc-950' : ''
                     }`}
                     style={{ backgroundColor: c }}
@@ -153,13 +155,13 @@ const GoalModal: React.FC<GoalModalProps> = ({
             </div>
 
             <div>
-              <label className="flex items-center gap-2 cursor-pointer mb-3 group">
-                <div className={`w-4 h-4 rounded flex items-center justify-center transition-colors border ${
+              <label className="flex items-center gap-3 cursor-pointer mb-3 group py-1 -my-1">
+                <div className={`w-6 h-6 rounded flex items-center justify-center transition-colors border flex-shrink-0 ${
                   trackWeight 
                     ? 'bg-emerald-500 border-emerald-500 text-white' 
-                    : 'bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 group-hover:border-emerald-500'
+                    : 'bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700'
                 }`}>
-                  {trackWeight && <Check className="w-3 h-3" strokeWidth={3} />}
+                  {trackWeight && <Check className="w-4 h-4" strokeWidth={3} />}
                 </div>
                 <input
                   type="checkbox"
@@ -167,12 +169,12 @@ const GoalModal: React.FC<GoalModalProps> = ({
                   onChange={(e) => setTrackWeight(e.target.checked)}
                   className="hidden"
                 />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-300 transition-colors">Bind to Weight Metrics</span>
+                <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-500 transition-colors">Bind to Weight Metrics</span>
               </label>
               
               {trackWeight && (
                 <div className="pl-6">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Target Weight (kg)</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Target Weight (kg)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -194,18 +196,18 @@ const GoalModal: React.FC<GoalModalProps> = ({
                   habits.map(habit => (
                     <label 
                       key={habit.id} 
-                      className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all border ${
+                      className={`flex items-center gap-3 min-h-[52px] p-2.5 rounded-lg cursor-pointer transition-all border ${
                         selectedHabits.includes(habit.id)
                           ? 'bg-emerald-500/10 border-emerald-500/30'
-                          : 'bg-white dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/50'
+                          : 'bg-white dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800'
                       }`}
                     >
-                      <div className={`w-4 h-4 rounded flex items-center justify-center transition-colors border ${
+                      <div className={`w-6 h-6 rounded flex items-center justify-center transition-colors border flex-shrink-0 ${
                         selectedHabits.includes(habit.id)
                           ? 'bg-emerald-500 border-emerald-500 text-white' 
                           : 'bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700'
                       }`}>
-                        {selectedHabits.includes(habit.id) && <Check className="w-3 h-3" strokeWidth={3} />}
+                        {selectedHabits.includes(habit.id) && <Check className="w-4 h-4" strokeWidth={3} />}
                       </div>
                       <input
                         type="checkbox"
@@ -225,18 +227,18 @@ const GoalModal: React.FC<GoalModalProps> = ({
           </form>
         </div>
 
-        <div className="p-4 border-t border-zinc-200 dark:border-zinc-800/80 flex justify-end gap-3 bg-zinc-50 dark:bg-zinc-950/50">
+        <div className="p-4 md:p-5 border-t border-zinc-200 dark:border-zinc-800/80 flex justify-end gap-3 bg-zinc-50 dark:bg-zinc-950/50 shrink-0 safe-bottom-sheet">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-transparent"
+            className="px-5 min-h-[48px] text-sm font-medium text-zinc-700 dark:text-zinc-300 active:bg-zinc-200 dark:active:bg-zinc-800 rounded-lg transition-colors border border-transparent"
           >
             Cancel
           </button>
           <button
             type="submit"
             form="goal-form"
-            className="px-4 py-2 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-all shadow-md hover:shadow-lg hover:shadow-emerald-500/20"
+            className="px-5 min-h-[48px] text-sm font-semibold text-white bg-emerald-500 active:bg-emerald-600 rounded-lg transition-all shadow-md"
           >
             {existingGoal ? 'Save Campaign' : 'Launch Campaign'}
           </button>

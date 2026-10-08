@@ -43,11 +43,11 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pt-4">
+    <div className="max-w-5xl mx-auto space-y-6 md:space-y-8 pt-2 md:pt-4 pb-2 md:pb-20">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 mb-2 md:mb-8">
+        <div className="min-w-0">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
             Physiology
           </h2>
           <p className="text-sm text-zinc-500 tracking-wide mt-1">
@@ -57,8 +57,8 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
       </header>
 
       {/* Weight Logger Widget */}
-      <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-4 md:p-6 border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 md:gap-6">
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <div className="w-10 h-10 bg-zinc-100 dark:bg-zinc-950 rounded-lg flex items-center justify-center text-zinc-400 border border-zinc-200 dark:border-zinc-800">
               <Scale className="w-5 h-5" />
@@ -80,7 +80,7 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
                   setSelectedDate(new Date(e.target.value));
                 }
               }}
-              className="flex-1 min-w-[140px] sm:flex-none px-3 py-2 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+              className="flex-1 min-w-[140px] sm:flex-none min-h-[44px] px-3 py-2 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
             />
             
             <div className="relative flex items-center gap-2 flex-1 min-w-[120px] sm:flex-none">
@@ -90,13 +90,13 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
                 value={weightInput}
                 onChange={(e) => setWeightInput(e.target.value)}
                 placeholder="0.0"
-                className="w-full sm:w-24 px-3 py-2 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-right font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                className="w-full sm:w-24 min-h-[44px] px-3 py-2 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-right font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
               />
               <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest shrink-0">kg</span>
             </div>
             <button
               onClick={handleSaveWeight}
-              className="w-full sm:w-auto px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-sm font-semibold rounded-lg transition-all shadow-sm sm:ml-2"
+              className="w-full sm:w-auto min-h-[44px] px-4 bg-zinc-900 active:bg-zinc-800 text-white dark:bg-white dark:active:bg-zinc-200 dark:text-zinc-900 text-sm font-semibold rounded-lg transition-all shadow-sm sm:ml-2"
             >
               Commit
             </button>
@@ -106,7 +106,7 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
 
       {/* Chart Section */}
       <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-4">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-emerald-500" />
             <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Trend Analysis</h3>
@@ -116,10 +116,10 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
               <button
                 key={opt.value}
                 onClick={() => setDateFilter(opt.value)}
-                className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${
+                className={`min-h-[44px] md:min-h-0 px-3.5 md:py-1 rounded text-[11px] md:text-[10px] font-bold uppercase tracking-widest transition-all ${
                   dateFilter === opt.value
                     ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-700'
-                    : 'text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-transparent'
+                    : 'text-zinc-500 dark:text-zinc-500 border border-transparent'
                 }`}
               >
                 {opt.label}
@@ -128,7 +128,7 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
           </div>
         </div>
         
-        <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-4 border border-zinc-200 dark:border-zinc-800/80 shadow-sm h-[350px]">
+        <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md rounded-xl p-3 md:p-4 border border-zinc-200 dark:border-zinc-800/80 shadow-sm h-[260px] md:h-[350px]">
           <WeightChart data={weightData} />
         </div>
       </div>

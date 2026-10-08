@@ -42,9 +42,9 @@ const SettingsView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pt-4 pb-20">
-      <div className="mb-8 border-b border-zinc-200 dark:border-zinc-800/80 pb-6">
-        <h2 className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">System Configuration</h2>
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 pt-2 md:pt-4 pb-2 md:pb-20">
+      <div className="mb-2 md:mb-8 border-b border-zinc-200 dark:border-zinc-800/80 pb-4 md:pb-6">
+        <h2 className="text-2xl md:text-3xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">System Configuration</h2>
         <p className="text-sm text-zinc-500 tracking-wide mt-1">Manage pillars, telemetry values, accountability, and export settings.</p>
       </div>
 
@@ -61,31 +61,31 @@ const SettingsView: React.FC = () => {
 
       {/* 1. Dynamic Pillars Manager */}
       <section className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50">
+        <div className="p-4 md:p-6 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50">
           <div className="flex items-center gap-3">
             <Target className="w-5 h-5 text-zinc-400 dark:text-zinc-500" />
             <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Pillars Manager</h3>
           </div>
           <p className="text-xs text-zinc-500 mt-2 tracking-wide">Define the core focus areas of your life. Routines must map to these pillars.</p>
         </div>
-        <div className="p-6 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="p-4 md:p-6 space-y-5 md:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {pillars.map(pillar => (
               <div key={pillar.id} className="flex items-center gap-3 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50" style={{ backgroundColor: `${pillar.color}20`, color: pillar.color }}>
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50 flex-shrink-0" style={{ backgroundColor: `${pillar.color}20`, color: pillar.color }}>
                   {emojiToIcon(pillar.icon, "w-5 h-5")}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{pillar.name}</p>
                 </div>
-                <button onClick={() => deletePillar(pillar.id)} className="p-2 rounded-md text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                <button onClick={() => deletePillar(pillar.id)} aria-label={`Delete ${pillar.name}`} className="w-11 h-11 -mr-1 flex items-center justify-center rounded-md text-zinc-400 active:text-red-500 active:bg-red-50 dark:active:bg-red-500/10 transition-colors flex-shrink-0">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             ))}
           </div>
 
-          <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
+          <div className="pt-5 md:pt-6 border-t border-zinc-200 dark:border-zinc-800">
             <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">Add New Pillar</h4>
             <div className="space-y-4">
               <input
@@ -93,25 +93,29 @@ const SettingsView: React.FC = () => {
                 placeholder="Pillar Name (e.g. Deep Work, Cardio)"
                 value={newPillar.name}
                 onChange={e => setNewPillar({ ...newPillar, name: e.target.value })}
-                className="w-full max-w-sm px-4 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                className="w-full max-w-sm px-4 py-3 md:py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
               />
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {COLOR_OPTIONS.map(c => (
                   <button
                     key={c}
                     onClick={() => setNewPillar({ ...newPillar, color: c })}
-                    className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${newPillar.color === c ? 'border-zinc-900 dark:border-white scale-110 shadow-md' : 'border-transparent'}`}
+                    aria-label={`Colour ${c}`}
+                    aria-pressed={newPillar.color === c}
+                    className={`w-11 h-11 md:w-8 md:h-8 rounded-full border-2 transition-transform ${newPillar.color === c ? 'border-zinc-900 dark:border-white scale-105 shadow-md' : 'border-transparent'}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
               </div>
-              <div className="flex flex-wrap gap-2 max-w-2xl bg-zinc-50 dark:bg-zinc-900/50 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
+              <div className="flex flex-wrap gap-1.5 md:gap-2 max-w-2xl bg-zinc-50 dark:bg-zinc-900/50 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
                 {EMOJI_OPTIONS.map(e => (
                   <button
                     key={e}
                     onClick={() => setNewPillar({ ...newPillar, icon: e })}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-                      newPillar.icon === e ? 'bg-zinc-200 dark:bg-zinc-700 shadow-sm' : 'hover:bg-zinc-200/50 dark:hover:bg-zinc-800'
+                    aria-label={`Icon ${e}`}
+                    aria-pressed={newPillar.icon === e}
+                    className={`w-11 h-11 rounded-lg flex items-center justify-center transition-all ${
+                      newPillar.icon === e ? 'bg-zinc-200 dark:bg-zinc-700 shadow-sm' : 'active:bg-zinc-200/50 dark:active:bg-zinc-800'
                     }`}
                   >
                     {emojiToIcon(e, "w-5 h-5")}
@@ -120,7 +124,7 @@ const SettingsView: React.FC = () => {
               </div>
               <button
                 onClick={handleAddPillar}
-                className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-sm font-semibold transition-colors"
+                className="flex items-center gap-2 min-h-[44px] px-5 bg-zinc-900 active:bg-zinc-800 dark:bg-white dark:active:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-sm font-semibold transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Create Pillar
@@ -132,27 +136,27 @@ const SettingsView: React.FC = () => {
 
       {/* 2. Value Metrics Setup */}
       <section className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50 flex justify-between items-center">
-          <div>
+        <div className="p-4 md:p-6 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50 flex justify-between items-center gap-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-3">
               <Zap className="w-5 h-5 text-zinc-400 dark:text-zinc-500" />
               <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Value Metrics</h3>
             </div>
             <p className="text-xs text-zinc-500 mt-2 tracking-wide">Track abstract value units, currency, or points associated with habits.</p>
           </div>
-          <label className="relative inline-flex items-center cursor-pointer">
+          <label className="relative inline-flex items-center cursor-pointer p-2.5 -m-2.5 flex-shrink-0">
             <input 
               type="checkbox" 
               className="sr-only peer" 
               checked={valueConfig.active}
               onChange={e => setValueConfig({ ...valueConfig, active: e.target.checked })}
             />
-            <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-emerald-500"></div>
+            <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[12px] after:left-[12px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-emerald-500"></div>
           </label>
         </div>
         {valueConfig.active && (
-          <div className="p-6 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="p-4 md:p-6 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Metric Symbol</label>
                 <input
@@ -160,7 +164,7 @@ const SettingsView: React.FC = () => {
                   value={valueConfig.symbol}
                   onChange={e => setValueConfig({ ...valueConfig, symbol: e.target.value })}
                   placeholder="e.g. $, pts, hrs"
-                  className="w-full px-4 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-emerald-500 outline-none"
+                  className="w-full px-4 py-3 md:py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-emerald-500 outline-none"
                 />
               </div>
               <div>
@@ -182,25 +186,27 @@ const SettingsView: React.FC = () => {
 
       {/* 3. Discipline Threshold */}
       <section className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50">
+        <div className="p-4 md:p-6 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50">
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-zinc-400 dark:text-zinc-500" />
             <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">High-Stakes Discipline</h3>
           </div>
           <p className="text-xs text-zinc-500 mt-2 tracking-wide">Set a strict baseline for a 14-day rolling window.</p>
         </div>
-        <div className="p-6 space-y-6">
+        <div className="p-4 md:p-6 space-y-5 md:space-y-6">
           <div>
             <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Threshold Percentage</label>
             <div className="flex items-center gap-4">
+              {/* 44px tall on every device: the rail is drawn by .range-thin's
+                  track pseudo-element, so the whole box is a drag target. */}
               <input
                 type="range"
                 min="50" max="100" step="1"
                 value={disciplineConfig.threshold}
                 onChange={e => setDisciplineConfig({ ...disciplineConfig, threshold: Number(e.target.value) })}
-                className="flex-1 h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer dark:bg-zinc-700 accent-red-500"
+                className="range-thin flex-1 appearance-none cursor-pointer accent-red-500"
               />
-              <span className="text-sm font-bold w-12 text-right text-red-600 dark:text-red-400">{disciplineConfig.threshold}%</span>
+              <span className="text-sm font-bold w-14 text-right text-red-600 dark:text-red-400 tabular-nums">{disciplineConfig.threshold}%</span>
             </div>
           </div>
           <div>
@@ -217,14 +223,14 @@ const SettingsView: React.FC = () => {
 
       {/* 4. Markdown Exporter Template */}
       <section className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50">
+        <div className="p-4 md:p-6 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50">
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5 text-zinc-400 dark:text-zinc-500" />
             <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Export Engine</h3>
           </div>
           <p className="text-xs text-zinc-500 mt-2 tracking-wide">Design your daily log markdown layout using merge variables.</p>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="p-4 md:p-6 space-y-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Custom Template</label>
             <textarea
@@ -248,22 +254,22 @@ const SettingsView: React.FC = () => {
       </section>
 
       {/* Session Section */}
-      <section className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl p-6 border border-red-200 dark:border-red-900/30 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <section className="bg-white dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-red-200 dark:border-red-900/30 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 md:gap-4 min-w-0">
             <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/20 flex items-center justify-center flex-shrink-0 border border-red-200 dark:border-red-900/50">
               <LogOut className="w-4 h-4 text-red-600 dark:text-red-500" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide">Lock This Device</h3>
-              <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1 max-w-sm">
+              <p className="text-[11px] uppercase tracking-widest text-zinc-500 mt-1 max-w-sm">
                 Clears the saved session. You'll need your access code to get back in.
               </p>
             </div>
           </div>
           <button
             onClick={lock}
-            className="px-4 py-2 rounded-lg text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 transition-all border border-red-200 dark:border-red-800/50"
+            className="min-h-[44px] px-4 flex-shrink-0 rounded-lg text-xs font-semibold bg-red-50 active:bg-red-100 text-red-600 dark:bg-red-900/20 dark:active:bg-red-900/40 dark:text-red-400 transition-all border border-red-200 dark:border-red-800/50"
           >
             Lock
           </button>

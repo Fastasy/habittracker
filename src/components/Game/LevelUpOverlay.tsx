@@ -117,7 +117,7 @@ const LevelUpOverlay: React.FC<{ stats: GameStats }> = ({ stats }) => {
       </AnimatePresence>
 
       {/* Fresh badges */}
-      <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex flex-col gap-2 pointer-events-none">
+      <div className="fixed bottom-24 md:bottom-6 right-3 md:right-6 left-3 md:left-auto z-40 flex flex-col items-end gap-2 pointer-events-none">
         <AnimatePresence>
           {fresh.map(a => {
             const t = TIER_STYLE[a.tier];
@@ -132,11 +132,11 @@ const LevelUpOverlay: React.FC<{ stats: GameStats }> = ({ stats }) => {
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${t.text}1a` }}>
                   <Icon className="w-4 h-4" style={{ color: t.text }} />
                 </div>
-                <div className="leading-tight">
-                  <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: t.text }}>
+                <div className="leading-tight min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: t.text }}>
                     {t.label} unlocked
                   </p>
-                  <p className="text-sm font-semibold text-white">{a.name}</p>
+                  <p className="text-sm font-semibold text-white truncate">{a.name}</p>
                 </div>
               </motion.div>
             );

@@ -78,7 +78,7 @@ const AuthenticatedApp: React.FC = () => {
   }, [weightLogs]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white transition-colors duration-300">
       <Sidebar
         currentView={currentView}
         onViewChange={setCurrentView}
@@ -88,10 +88,10 @@ const AuthenticatedApp: React.FC = () => {
       <MobileNav currentView={currentView} onViewChange={setCurrentView} stats={stats} />
 
       {/* Main content */}
-      <main className="md:ml-64 min-h-screen">
-        <div className="p-4 pt-16 md:pt-0 pb-24 md:pb-0 md:p-8">
+      <main className="md:ml-64 min-h-dvh">
+        <div className="app-main">
           {/* Persistent HUD — level, XP, combo and badges stay in view everywhere */}
-          <div className="mb-6">
+          <div className="mb-4 md:mb-6">
             <HudBar stats={stats} onOpenAchievements={() => setCurrentView('achievements')} />
           </div>
 
@@ -171,7 +171,7 @@ const AppContent: React.FC = () => {
 
   if (isAuthLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+      <div className="min-h-dvh bg-white dark:bg-black flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
       </div>
     );

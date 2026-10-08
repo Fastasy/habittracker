@@ -30,7 +30,7 @@ const PasscodeView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4 selection:bg-emerald-500/30">
+    <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4 py-10 selection:bg-emerald-500/30">
       <div className="w-full max-w-[380px]">
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-10">
@@ -84,7 +84,7 @@ const PasscodeView: React.FC = () => {
                   autoComplete="current-password"
                   spellCheck={false}
                   autoCapitalize="none"
-                  className="block w-full pl-9 pr-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 tracking-widest"
+                  className="block w-full pl-9 pr-3 py-3 md:py-2.5 text-sm bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 tracking-widest"
                   placeholder="••••••••••"
                 />
               </div>
@@ -93,7 +93,7 @@ const PasscodeView: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading || code.trim().length === 0}
-              className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium text-white bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-white dark:focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full mt-2 flex items-center justify-center gap-2 min-h-[48px] py-2.5 px-4 rounded-lg text-sm font-medium text-white bg-zinc-900 active:bg-zinc-800 dark:bg-white dark:active:bg-zinc-200 dark:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-white dark:focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
