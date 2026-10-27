@@ -7,19 +7,12 @@ import MobileNav from './components/Layout/MobileNav';
 import TodayView from './components/Today/TodayView';
 import CalendarView from './components/Calendar/CalendarView';
 import HabitsView from './components/Habits/HabitsView';
-import AnalyticsView from './components/Analytics/AnalyticsView';
-import SettingsView from './components/Settings/SettingsView';
-import GoalsView from './components/Goals/GoalsView';
 import FitnessView from './components/Fitness/FitnessView';
-import AchievementsView from './components/Game/AchievementsView';
-import HudBar from './components/Game/HudBar';
-import LevelUpOverlay from './components/Game/LevelUpOverlay';
+import SettingsView from './components/Settings/SettingsView';
 import PasscodeView from './components/Auth/PasscodeView';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { useGoals } from './hooks/useGoals';
 import { useWeight } from './hooks/useWeight';
 import { useCalendar } from './hooks/useCalendar';
-import { useGameState } from './game/useGameState';
 
 /**
  * Data hooks live here, INSIDE the auth gate.
@@ -44,38 +37,12 @@ const AuthenticatedApp: React.FC = () => {
     getCompletionRate,
     getOverallCompletionRate,
     getTotalCheckIns,
-    getWeeklyCompletionData,
-    getWeekdayStats,
-    getHeatmapData,
     getLongestActiveStreak,
     getHabitMiniTrend,
-    setHabitGoal,
   } = useHabits();
 
-  const { goals, addGoal, updateGoal, deleteGoal } = useGoals();
-  const { logWeight, getWeightLog, getWeightLogs, logs: weightLogs } = useWeight();
-  // Owned here (not inside CalendarView) so the Calendar and the Objective
-  // cards read and write ONE list — ticking a linked to-do in either place
-  // updates both immediately.
+  const { logWeight, getWeightLog, getWeightLogs } = useWeight();
   const calendar = useCalendar();
-
-  /** The game layer: XP, level, rank, combo, achievements — all derived. */
-  const stats = useGameState({
-    habits,
-    logs,
-    goals,
-    todos: calendar.todos,
-    notes: calendar.notes,
-    weightLogs,
-    getStreak,
-  });
-
-  // Compute latest weight for GoalsView
-  const latestWeight = React.useMemo(() => {
-    if (weightLogs.length === 0) return undefined;
-    const sorted = [...weightLogs].sort((a, b) => b.date.localeCompare(a.date));
-    return sorted[0].weight;
-  }, [weightLogs]);
 
   return (
     <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white transition-colors duration-300">
@@ -83,18 +50,12 @@ const AuthenticatedApp: React.FC = () => {
         currentView={currentView}
         onViewChange={setCurrentView}
         habitCount={habits.length}
-        stats={stats}
       />
-      <MobileNav currentView={currentView} onViewChange={setCurrentView} stats={stats} />
+      <MobileNav currentView={currentView} onViewChange={setCurrentView} />
 
       {/* Main content */}
       <main className="md:ml-64 min-h-dvh">
         <div className="app-main">
-          {/* Persistent HUD — level, XP, combo and badges stay in view everywhere */}
-          <div className="mb-4 md:mb-6">
-            <HudBar stats={stats} onOpenAchievements={() => setCurrentView('achievements')} />
-          </div>
-
           {currentView === 'today' && (
             <TodayView
               habits={habits}
@@ -103,10 +64,12 @@ const AuthenticatedApp: React.FC = () => {
               toggleLog={toggleLog}
               logAmount={logAmount}
               getStreak={getStreak}
-              stats={stats}
+              getOverallCompletionRate={getOverallCompletionRate}
+              getTotalCheckIns={getTotalCheckIns}
+              getLongestActiveStreak={getLongestActiveStreak}
             />
           )}
-          {currentView === 'calendar' && <CalendarView calendar={calendar} goals={goals} />}
+          {currentView === 'calendar' && <CalendarView calendar={calendar} />}
           {currentView === 'habits' && (
             <HabitsView
               habits={habits}
@@ -118,22 +81,6 @@ const AuthenticatedApp: React.FC = () => {
               getHabitMiniTrend={getHabitMiniTrend}
             />
           )}
-          {currentView === 'goals' && (
-            <GoalsView
-              goals={goals}
-              habits={habits}
-              todos={calendar.todos}
-              onAddGoal={addGoal}
-              onUpdateGoal={updateGoal}
-              onDeleteGoal={deleteGoal}
-              setHabitGoal={setHabitGoal}
-              onToggleTodo={calendar.toggleTodo}
-              onClearGoalTodoLinks={calendar.clearGoalLinks}
-              getCompletionRate={getCompletionRate}
-              getStreak={getStreak}
-              latestWeight={latestWeight}
-            />
-          )}
           {currentView === 'fitness' && (
             <FitnessView
               getWeightLog={getWeightLog}
@@ -141,27 +88,9 @@ const AuthenticatedApp: React.FC = () => {
               getWeightLogs={getWeightLogs}
             />
           )}
-          {currentView === 'analytics' && (
-            <AnalyticsView
-              habits={habits}
-              getStreak={getStreak}
-              getCompletionRate={getCompletionRate}
-              getOverallCompletionRate={getOverallCompletionRate}
-              getTotalCheckIns={getTotalCheckIns}
-              getWeeklyCompletionData={getWeeklyCompletionData}
-              getWeekdayStats={getWeekdayStats}
-              getHeatmapData={getHeatmapData}
-              getLongestActiveStreak={getLongestActiveStreak}
-              getHabitMiniTrend={getHabitMiniTrend}
-            />
-          )}
-          {currentView === 'achievements' && <AchievementsView stats={stats} />}
           {currentView === 'settings' && <SettingsView />}
         </div>
       </main>
-
-      {/* Level-up + badge celebrations */}
-      <LevelUpOverlay stats={stats} />
     </div>
   );
 };

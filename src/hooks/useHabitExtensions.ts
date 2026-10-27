@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 
 export interface HabitExtension {
-  pillarId?: string;
-  value?: number;
   isQuantifiable?: boolean;
   targetAmount?: number;
   unit?: string;

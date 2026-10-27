@@ -106,9 +106,6 @@ const carryOverDue = async (rows: TodoRow[]): Promise<TodoRow[]> => {
  * auth.uid() = user_id) so it syncs across devices like habits/goals/weight.
  * Updates are optimistic: state changes immediately, the write fires after.
  *
- * A to-do may optionally be linked to a goal (todos.goal_id -> goals.id). The
- * link is one shared instance owned by App, so the Calendar and an Objective
- * card always show the same thing.
  */
 export const useCalendar = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -169,13 +166,13 @@ export const useCalendar = () => {
     };
   }, [load]);
 
-  const addTodo = useCallback((date: string, text: string, goalId?: string) => {
+  const addTodo = useCallback((date: string, text: string) => {
     const clean = text.trim();
     if (!clean) return;
     const id = crypto.randomUUID();
 
-    setTodos(prev => [...prev, { id, date, text: clean, done: false, goalId }]);
-    supabase.from('todos').insert({ id, date, text: clean, done: false, goal_id: goalId || null })
+    setTodos(prev => [...prev, { id, date, text: clean, done: false }]);
+    supabase.from('todos').insert({ id, date, text: clean, done: false })
       .then(res => { if (res.error) console.error(res.error); });
   }, []);
 
@@ -195,20 +192,6 @@ export const useCalendar = () => {
       .then(res => { if (res.error) console.error(res.error); });
   }, []);
 
-  /** Link (or unlink) a to-do to a goal. */
-  const setTodoGoal = useCallback((id: string, goalId?: string) => {
-    setTodos(prev => prev.map(t => (t.id === id ? { ...t, goalId } : t)));
-    supabase.from('todos').update({ goal_id: goalId || null }).eq('id', id)
-      .then(res => { if (res.error) console.error(res.error); });
-  }, []);
-
-  /**
-   * Drop local links to a deleted goal. The database does this itself via
-   * `on delete set null`; this keeps the UI honest without a refetch.
-   */
-  const clearGoalLinks = useCallback((goalId: string) => {
-    setTodos(prev => prev.map(t => (t.goalId === goalId ? { ...t, goalId: undefined } : t)));
-  }, []);
 
   const saveNote = useCallback((date: string, note: string) => {
     setNotes(prev => {
@@ -239,11 +222,6 @@ export const useCalendar = () => {
     [todos]
   );
   const noteFor = useCallback((date: string) => notes[date] ?? '', [notes]);
-  const todosForGoal = useCallback((goalId: string) => todos.filter(t => t.goalId === goalId), [todos]);
-  const openCountForGoal = useCallback(
-    (goalId: string) => todos.filter(t => t.goalId === goalId && !t.done).length,
-    [todos]
-  );
 
   return {
     todos,
@@ -252,16 +230,12 @@ export const useCalendar = () => {
     addTodo,
     toggleTodo,
     deleteTodo,
-    setTodoGoal,
-    clearGoalLinks,
     saveNote,
     todosFor,
     openCount,
     doneCount,
     missedCount,
     noteFor,
-    todosForGoal,
-    openCountForGoal,
   };
 };
 

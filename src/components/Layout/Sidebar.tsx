@@ -1,31 +1,26 @@
 import React from 'react';
 import {
-  Swords, ListChecks, BarChart3, Moon, Sun, Settings, Target, Dumbbell,
-  CalendarDays, Trophy,
+  Swords, ListChecks, Moon, Sun, Settings, Dumbbell,
+  CalendarDays,
 } from 'lucide-react';
 import { ViewType } from '../../types/habit';
 import { useTheme } from '../../contexts/ThemeContext';
-import { GameStats } from '../../game/types';
 
 interface SidebarProps {
   currentView: ViewType;
   onViewChange: (view: ViewType) => void;
   habitCount: number;
-  stats?: GameStats;
 }
 
 const navItems = [
-  { id: 'today' as ViewType, label: 'Command', icon: Swords },
+  { id: 'today' as ViewType, label: 'Today', icon: Swords },
   { id: 'calendar' as ViewType, label: 'Calendar', icon: CalendarDays },
-  { id: 'habits' as ViewType, label: 'Quests', icon: ListChecks },
-  { id: 'goals' as ViewType, label: 'Campaigns', icon: Target },
+  { id: 'habits' as ViewType, label: 'Habits', icon: ListChecks },
   { id: 'fitness' as ViewType, label: 'Training', icon: Dumbbell },
-  { id: 'analytics' as ViewType, label: 'Stats', icon: BarChart3 },
-  { id: 'achievements' as ViewType, label: 'Trophies', icon: Trophy },
   { id: 'settings' as ViewType, label: 'Settings', icon: Settings },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, habitCount, stats }) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, habitCount }) => {
   const { isDark, toggleDark } = useTheme();
 
   return (
@@ -33,43 +28,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, habitCount
       {/* Brand */}
       <div className="px-6 py-7 border-b border-zinc-200 dark:border-zinc-900/50">
         <h1 className="font-semibold text-zinc-900 dark:text-white text-xl tracking-tight leading-none uppercase">Streakly</h1>
-        <p className="text-[9px] font-mono text-zinc-500 tracking-widest mt-2 uppercase">Operating System v2.0</p>
+        <p className="text-[9px] font-mono text-zinc-500 tracking-widest mt-2 uppercase">Discipline OS</p>
       </div>
-
-      {/* Player card */}
-      {stats && (
-        <div className="px-4 pt-5">
-          <div
-            className="rounded-xl border p-3 relative overflow-hidden"
-            style={{ borderColor: `${stats.rank.color}44`, backgroundColor: `${stats.rank.color}0f` }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 border"
-                style={{ borderColor: `${stats.rank.color}66`, backgroundColor: `${stats.rank.color}1a` }}
-              >
-                <span className="text-sm font-bold tabular-nums" style={{ color: stats.rank.color }}>{stats.level}</span>
-              </div>
-              <div className="min-w-0">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Level {stats.level}</p>
-                <p className="text-sm font-bold truncate" style={{ color: stats.rank.color }}>{stats.rank.name}</p>
-              </div>
-            </div>
-            <div className="mt-2.5 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${Math.max(3, (stats.xpIntoLevel / Math.max(1, stats.xpForNext)) * 100)}%`,
-                  background: `linear-gradient(90deg, ${stats.rank.color}, #34d399)`,
-                }}
-              />
-            </div>
-            <p className="mt-1.5 text-[9px] uppercase tracking-widest text-zinc-500 tabular-nums">
-              {stats.xpIntoLevel}/{stats.xpForNext} XP
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Nav */}
       <nav className="flex-1 px-4 py-5 space-y-1 overflow-y-auto scrollbar-hide">
@@ -95,15 +55,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, habitCount
                     : 'bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-500'
                 }`}>
                   {habitCount}
-                </span>
-              )}
-              {id === 'achievements' && stats && (
-                <span className={`ml-auto text-[10px] px-2 py-0.5 rounded-md font-medium border tabular-nums ${
-                  isActive
-                    ? 'bg-zinc-200 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white'
-                    : 'bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-500'
-                }`}>
-                  {stats.achievements.filter(a => a.unlocked).length}
                 </span>
               )}
             </button>

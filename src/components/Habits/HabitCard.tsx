@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Pencil, Trash2, Flame, Trophy, TrendingUp, MoreVertical } from 'lucide-react';
 import { Habit, StreakInfo } from '../../types/habit';
 import { emojiToIcon } from '../../utils/iconMap';
-import { completionXp } from '../../game/xp';
-import InfoTooltip from '../InfoTooltip';
 
 interface HabitCardProps {
   habit: Habit;
@@ -67,32 +65,15 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, streak, completionRate, mi
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  // Thermodynamic "Streak Heat" Logic
   const currentStreak = streak.current;
-  let heatClasses = 'border-zinc-200 dark:border-zinc-800/80';
-  let isBlazing = false;
-
-  if (currentStreak >= 7) {
-    isBlazing = true;
-    heatClasses = 'border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.25)]';
-  } else if (currentStreak >= 3) {
-    heatClasses = 'border-zinc-300 dark:border-zinc-600 shadow-[0_0_10px_rgba(255,255,255,0.05)]';
-  }
 
   return (
     // `relative` is always on: the delete confirmation is an `absolute inset-0`
     // overlay, and without a positioned ancestor it escaped to the viewport.
-    <div className={`relative bg-zinc-50 dark:bg-zinc-900/40 backdrop-blur-md rounded-xl border p-3.5 md:p-4 transition-all duration-200 group flex flex-col gap-3.5 md:gap-4 ${heatClasses}`}>
-
-      {isBlazing && (
-        <div className="absolute top-0 left-0 w-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-widest text-center py-1 flex items-center justify-center gap-2 rounded-t-xl">
-          <span>🔥 Blazing Streak • Compounding at +5% Daily</span>
-          <InfoTooltip text="Blazing streaks (7+ days) trigger the 5% daily compounding multiplier on your Discipline Net Worth." />
-        </div>
-      )}
+    <div className="relative bg-zinc-50 dark:bg-zinc-900/40 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-zinc-800/80 p-3.5 md:p-4 transition-all duration-200 group flex flex-col gap-3.5 md:gap-4">
 
       {/* Header Row */}
-      <div className={`flex items-start justify-between gap-2 ${isBlazing ? 'mt-4' : ''}`}>
+      <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
           <div
             className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -104,12 +85,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, streak, completionRate, mi
             <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 tracking-wide text-sm truncate">{habit.name}</h3>
             <div className="mt-1 flex items-center gap-1.5 flex-wrap">
               <FrequencyBadge habit={habit} />
-              <span
-                className="text-[11px] font-bold px-1.5 py-0.5 rounded border text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20 tabular-nums"
-                title="XP banked each time you clear this quest, at your current combo"
-              >
-                +{completionXp(Math.max(1, currentStreak))} XP
-              </span>
+
               {currentStreak >= 2 && (
                 <span
                   className="text-[11px] font-bold px-1.5 py-0.5 rounded border text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/25 tabular-nums"

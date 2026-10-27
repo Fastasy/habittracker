@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  Flame, BookOpen, Terminal, Dumbbell, Droplet, Moon, Heart, Zap,
-  Briefcase, Coffee, Music, Smile, Star, Target, CheckCircle2,
-  ListChecks, PenTool, Layout, Activity, Utensils, Edit3, Leaf, Bike,
+  Flame, BookOpen, Terminal, Dumbbell, Droplet, Moon, Heart,
+  Briefcase, Coffee, Music, Smile, Star, Target,
+  PenTool, Layout, Activity, Utensils, Edit3, Leaf, Bike,
   Sparkles, Pill, Brain, Sunrise, HeartHandshake, Wind
 } from 'lucide-react';
 

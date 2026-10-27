@@ -12,7 +12,6 @@ import {
   isBefore,
   eachDayOfInterval,
   subDays,
-  getDayOfWeek,
   addDays,
 } from '../utils/dateUtils';
 
@@ -20,7 +19,7 @@ export const useHabits = () => {
   const [store, setStore] = useState<HabitStore>({ habits: [], logs: [] });
   const [isLoading, setIsLoading] = useState(true);
   const { extensions, setExtension, deleteExtension } = useHabitExtensions();
-  const { logExtensions, setLogExtension, deleteLogExtension } = useHabitLogExtensions();
+  const { setLogExtension } = useHabitLogExtensions();
 
   useEffect(() => {
     const loadData = async () => {
@@ -43,7 +42,6 @@ export const useHabits = () => {
           isBad: h.is_bad,
           emoji: h.icon,
           createdAt: new Date(h.created_at).toISOString().split('T')[0],
-          goalId: h.goal_id
         }));
 
         const logs = logsRes.data.map(l => ({
@@ -67,20 +65,12 @@ export const useHabits = () => {
   const mergedHabits = useMemo(() => {
     return store.habits.map(h => ({
       ...h,
-      pillarId: extensions[h.id]?.pillarId,
-      value: extensions[h.id]?.value,
       isQuantifiable: extensions[h.id]?.isQuantifiable,
       targetAmount: extensions[h.id]?.targetAmount,
       unit: extensions[h.id]?.unit,
     }));
   }, [store.habits, extensions]);
 
-  const mergedLogs = useMemo(() => {
-    return store.logs.map(l => ({
-      ...l,
-      amount: logExtensions[`${l.habitId}_${l.date}`]?.amount
-    }));
-  }, [store.logs, logExtensions]);
 
   const addHabit = useCallback((habit: Omit<Habit, 'id' | 'createdAt'>) => {
     const id = crypto.randomUUID();
@@ -94,8 +84,6 @@ export const useHabits = () => {
     
     // Save extensions locally
     setExtension(id, { 
-      pillarId: habit.pillarId, 
-      value: habit.value,
       isQuantifiable: habit.isQuantifiable,
       targetAmount: habit.targetAmount,
       unit: habit.unit
@@ -123,15 +111,11 @@ export const useHabits = () => {
     }));
     
     if (
-      updates.pillarId !== undefined || 
-      updates.value !== undefined ||
       updates.isQuantifiable !== undefined ||
       updates.targetAmount !== undefined ||
       updates.unit !== undefined
     ) {
       setExtension(id, { 
-        pillarId: updates.pillarId, 
-        value: updates.value,
         isQuantifiable: updates.isQuantifiable,
         targetAmount: updates.targetAmount,
         unit: updates.unit
@@ -163,15 +147,6 @@ export const useHabits = () => {
       .then(res => { if (res.error) console.error(res.error); });
   }, [deleteExtension]);
 
-  const setHabitGoal = useCallback((habitId: string, goalId?: string) => {
-    setStore(prev => ({
-      ...prev,
-      habits: prev.habits.map(h => h.id === habitId ? { ...h, goalId } : h)
-    }));
-    
-    supabase.from('habits').update({ goal_id: goalId || null }).eq('id', habitId)
-      .then(res => { if (res.error) console.error(res.error); });
-  }, []);
 
   const toggleLog = useCallback((habitId: string, date: string) => {
     setStore(prev => {
@@ -406,85 +381,6 @@ export const useHabits = () => {
     [store.logs]
   );
 
-  const getDailyCompletionData = useCallback(
-    (days: string[]) => {
-      return days.map(date => {
-        const activeHabits = store.habits.filter(h => isHabitScheduledForDate(h, date));
-        const completed = activeHabits.filter(h =>
-          store.logs.some(l => l.habitId === h.id && l.date === date && l.completed)
-        );
-        return {
-          date,
-          total: activeHabits.length,
-          completed: completed.length,
-          rate: activeHabits.length > 0 ? Math.round((completed.length / activeHabits.length) * 100) : 0,
-        };
-      });
-    },
-    [store]
-  );
-
-  const getWeeklyCompletionData = useCallback(
-    (numWeeks: number) => {
-      const result = [];
-      const endDate = new Date();
-      for (let i = numWeeks - 1; i >= 0; i--) {
-        const weekEnd = subDays(endDate, i * 7);
-        const weekStart = subDays(weekEnd, 6);
-        const days = eachDayOfInterval({ start: weekStart, end: weekEnd }).map(toDateString);
-        const rate = getOverallCompletionRate(days);
-        result.push({
-          label: `W${numWeeks - i}`,
-          week: toDateString(weekStart),
-          rate,
-        });
-      }
-      return result;
-    },
-    [getOverallCompletionRate]
-  );
-
-  const getWeekdayStats = useCallback(
-    (days: string[]) => {
-      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const stats = dayNames.map((name, idx) => {
-        const dayDates = days.filter(d => getDayOfWeek(d) === idx);
-        let totalScheduled = 0;
-        let totalCompleted = 0;
-        for (const habit of store.habits) {
-          const scheduled = dayDates.filter(d => isHabitScheduledForDate(habit, d));
-          totalScheduled += scheduled.length;
-          totalCompleted += scheduled.filter(d =>
-            store.logs.some(l => l.habitId === habit.id && l.date === d && l.completed)
-          ).length;
-        }
-        return {
-          day: name,
-          rate: totalScheduled > 0 ? Math.round((totalCompleted / totalScheduled) * 100) : 0,
-          total: totalScheduled,
-        };
-      });
-      return stats;
-    },
-    [store]
-  );
-
-  const getHeatmapData = useCallback(
-    (days: string[]): Record<string, number> => {
-      const result: Record<string, number> = {};
-      for (const date of days) {
-        const activeHabits = store.habits.filter(h => isHabitScheduledForDate(h, date));
-        const completed = activeHabits.filter(h =>
-          store.logs.some(l => l.habitId === h.id && l.date === date && l.completed)
-        );
-        result[date] = activeHabits.length > 0
-          ? completed.length / activeHabits.length
-          : -1; // -1 = no habits scheduled
-      }
-      return result;
-    },
-    [store]
-  );
 
   const getLongestActiveStreak = useCallback((): number => {
     if (store.habits.length === 0) return 0;
@@ -520,12 +416,7 @@ export const useHabits = () => {
     getCompletionRate,
     getOverallCompletionRate,
     getTotalCheckIns,
-    getDailyCompletionData,
-    getWeeklyCompletionData,
-    getWeekdayStats,
-    getHeatmapData,
     getLongestActiveStreak,
     getHabitMiniTrend,
-    setHabitGoal,
   };
 };

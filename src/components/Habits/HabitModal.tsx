@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { X, Check } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Habit, FrequencyType } from '../../types/habit';
 import { emojiToIcon } from '../../utils/iconMap';
-import { useSettings } from '../../hooks/useSettings';
 
 const EMOJI_OPTIONS = [
   '🏃', '💪', '📚', '🧘', '💧', '🥗', '😴', '🎯', '✍️', '🎵',
@@ -37,13 +36,11 @@ interface HabitModalProps {
 }
 
 /**
- * Quest editor. A bottom sheet on phones (so the on-screen keyboard has
+ * Habit editor. A bottom sheet on phones (so the on-screen keyboard has
  * somewhere to live) and a centred dialog from `md` up. Actions are pinned to
  * the bottom of the sheet and the body scrolls under them.
  */
 const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
-  const { pillars, valueConfig } = useSettings();
-
   const [name, setName] = useState(habit?.name ?? '');
   const [emoji, setEmoji] = useState(habit?.emoji ?? '🎯');
   const [color, setColor] = useState(habit?.color ?? '#10b981');
@@ -51,8 +48,6 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
   const [specificDays, setSpecificDays] = useState<number[]>(habit?.specificDays ?? [1, 2, 3, 4, 5]);
   const [timesPerWeek, setTimesPerWeek] = useState(habit?.timesPerWeek ?? 3);
   const [isBad, setIsBad] = useState(habit?.isBad ?? false);
-  const [pillarId, setPillarId] = useState<string>(habit?.pillarId ?? (pillars.length > 0 ? pillars[0].id : ''));
-  const [value, setValue] = useState<number | undefined>(habit?.value);
 
   const [isQuantifiable, setIsQuantifiable] = useState(habit?.isQuantifiable ?? false);
   const [targetAmount, setTargetAmount] = useState(habit?.targetAmount ?? 1);
@@ -70,10 +65,6 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
       setNameError('Please select at least one day');
       return;
     }
-    if (pillars.length > 0 && !pillarId) {
-      setNameError('Please select a pillar');
-      return;
-    }
     if (isQuantifiable && targetAmount <= 0) {
       setNameError('Target amount must be greater than zero');
       return;
@@ -86,8 +77,6 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
       specificDays: frequency === 'specific_days' ? specificDays : undefined,
       timesPerWeek: frequency === 'times_per_week' ? timesPerWeek : undefined,
       isBad,
-      pillarId: pillars.length > 0 ? pillarId : undefined,
-      value: valueConfig.active ? value : undefined,
       isQuantifiable,
       targetAmount: isQuantifiable ? targetAmount : undefined,
       unit: isQuantifiable ? unit.trim() : undefined,
@@ -135,41 +124,6 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
               {nameError && <p className="text-red-500 text-xs mt-1.5">{nameError}</p>}
             </div>
 
-            {/* Pillar Mapping */}
-            {pillars.length > 0 && (
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
-                  Pillar Mapping
-                </label>
-                <select
-                  value={pillarId}
-                  onChange={e => setPillarId(e.target.value)}
-                  className={inputCls}
-                >
-                  <option value="" disabled>Select a Pillar</option>
-                  {pillars.map(p => (
-                    <option key={p.id} value={p.id}>{p.icon} {p.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {/* Value Tracking */}
-            {valueConfig.active && (
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
-                  Value Assignment ({valueConfig.symbol})
-                </label>
-                <input
-                  type="number"
-                  value={value ?? ''}
-                  onChange={e => setValue(e.target.value ? Number(e.target.value) : undefined)}
-                  placeholder={`Value (+/- ${valueConfig.symbol})`}
-                  className={inputCls}
-                />
-                <p className="text-[11px] text-zinc-500 mt-1.5">Assign positive or negative {valueConfig.symbol} for completing this routine.</p>
-              </div>
-            )}
 
             {/* Quantifiable Habit */}
             <div>
@@ -412,7 +366,7 @@ const HabitModal: React.FC<HabitModalProps> = ({ habit, onSave, onClose }) => {
               type="submit"
               className="flex-1 min-h-[48px] rounded-lg bg-emerald-500 active:bg-emerald-600 text-white text-sm font-semibold shadow-md transition-all"
             >
-              {habit ? 'Save Quest' : 'Deploy Quest'}
+              {habit ? 'Save Habit' : 'Create Habit'}
             </button>
           </div>
         </form>

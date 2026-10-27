@@ -1,23 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import {
-  ChevronLeft, ChevronRight, LayoutList, CheckCircle2, Target, Coffee, Zap,
-  AlertCircle, Copy, TrendingUp, AlertTriangle, Swords, Flame, Trophy, Lock,
+  ChevronLeft, ChevronRight, LayoutList, CheckCircle2, Coffee,
+  AlertCircle, TrendingUp, Flame,
 } from 'lucide-react';
 import { format, subDays, addDays, isToday } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Habit } from '../../types/habit';
 import { useHabits } from '../../hooks/useHabits';
 import { useSettings } from '../../hooks/useSettings';
-import { useMomentum } from '../../hooks/useMomentum';
 import { toDateString, isHabitScheduledForDate, getLastNDays } from '../../utils/dateUtils';
 import HabitCheckItem from './HabitCheckItem';
-import { emojiToIcon } from '../../utils/iconMap';
-import MomentumChart from './MomentumChart';
 import InfoTooltip from '../InfoTooltip';
-import { GameStats } from '../../game/types';
-import { completionXp } from '../../game/xp';
-import { TIER_STYLE } from '../../game/achievements';
-import { ACHIEVEMENT_ICONS } from '../Game/LevelUpOverlay';
 
 interface TodayViewProps {
   habits: Habit[];
@@ -26,16 +19,20 @@ interface TodayViewProps {
   toggleLog: ReturnType<typeof useHabits>['toggleLog'];
   logAmount: ReturnType<typeof useHabits>['logAmount'];
   getStreak: ReturnType<typeof useHabits>['getStreak'];
-  stats: GameStats;
+  getOverallCompletionRate: ReturnType<typeof useHabits>['getOverallCompletionRate'];
+  getTotalCheckIns: ReturnType<typeof useHabits>['getTotalCheckIns'];
+  getLongestActiveStreak: ReturnType<typeof useHabits>['getLongestActiveStreak'];
 }
 
 const card = 'bg-white dark:bg-zinc-900/60 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/80 rounded-2xl shadow-sm';
 
-/** The Command Center — today's quest board and the run you're on. */
-const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggleLog, logAmount, getStreak, stats }) => {
+/** Today — the day's habits and the run you're on. */
+const TodayView: React.FC<TodayViewProps> = ({
+  habits, logs, isCompleted, toggleLog, logAmount, getStreak,
+  getOverallCompletionRate, getTotalCheckIns, getLongestActiveStreak,
+}) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { pillars, valueConfig, disciplineConfig, exportConfig } = useSettings();
-  const momentumData = useMomentum();
+  const { disciplineConfig } = useSettings();
 
   const dateStr = toDateString(selectedDate);
   const isTodaySelected = isToday(selectedDate);
@@ -50,72 +47,20 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
   const pendingHabits = scheduledHabits.filter(h => !isCompleted(h.id, dateStr));
   const completedCount = completedHabits.length;
   const totalCount = scheduledHabits.length;
-  const progressPct = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
   const allDone = totalCount > 0 && completedCount === totalCount;
 
   const dayLabel = isTodaySelected ? 'Today' : format(selectedDate, 'EEEE');
   const dateLabel = format(selectedDate, 'MMMM d, yyyy');
 
-  /** XP a quest banks at its current combo. */
-  const xpFor = (habit: Habit, done: boolean) => {
-    const streak = getStreak(habit.id).current;
-    return completionXp(Math.max(1, done ? streak - 1 : streak));
-  };
-
-  const boardXp = useMemo(
-    () => completedHabits.reduce((sum, h) => sum + xpFor(h, true), 0),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [completedHabits, habits]
-  );
-
-  const totalValueAccumulated = useMemo(
-    () => completedHabits.reduce((sum, h) => sum + (h.value || 0), 0),
-    [completedHabits]
-  );
-
-  const pillarStats = useMemo(() => pillars.map(p => {
-    const pHabits = scheduledHabits.filter(h => h.pillarId === p.id);
-    const pCompleted = completedHabits.filter(h => h.pillarId === p.id);
-    return { ...p, total: pHabits.length, completed: pCompleted.length, progress: pHabits.length ? (pCompleted.length / pHabits.length) * 100 : 0 };
-  }).filter(p => p.total > 0), [pillars, scheduledHabits, completedHabits]);
-
   const disciplineInfo = useMemo(() => {
     const last14 = getLastNDays(14);
-    let scheduled = 0, completed = 0;
-    for (const day of last14) {
-      const sch = habits.filter(h => isHabitScheduledForDate(h, day));
-      scheduled += sch.length;
-      completed += sch.filter(h => isCompleted(h.id, day)).length;
-    }
-    const rate = scheduled > 0 ? (completed / scheduled) * 100 : 100;
+    const rate = getOverallCompletionRate(last14);
     return { rate, isFailing: rate < disciplineConfig.threshold };
-  }, [habits, isCompleted, disciplineConfig]);
+  }, [getOverallCompletionRate, disciplineConfig]);
 
-  const handleExport = () => {
-    let tpl = exportConfig.template;
-    tpl = tpl.replace(/\{\{date\}\}/g, dateLabel);
-    tpl = tpl.replace(/\{\{discipline_status\}\}/g, `${disciplineInfo.rate.toFixed(1)}%`);
-    tpl = tpl.replace(/\{\{completed_habits\}\}/g, completedCount.toString());
-    tpl = tpl.replace(/\{\{missed_habits\}\}/g, pendingHabits.length.toString());
-    tpl = tpl.replace(/\{\{value_accumulated\}\}/g, `${totalValueAccumulated} ${valueConfig.symbol}`);
+  const totalCheckIns = useMemo(() => getTotalCheckIns(), [getTotalCheckIns]);
+  const longestStreak = useMemo(() => getLongestActiveStreak(), [getLongestActiveStreak]);
 
-    let pStatsStr = '';
-    for (const p of pillarStats) pStatsStr += `\n- ${p.icon} ${p.name}: ${p.completed}/${p.total} (${p.progress.toFixed(0)}%)`;
-    tpl = tpl.replace(/\{\{pillar_stats\}\}/g, pStatsStr.trim() || 'No pillars active');
-
-    navigator.clipboard.writeText(tpl).then(() => alert('Daily log copied to clipboard!'));
-  };
-
-  // Closest badges to unlocking
-  const nextBadges = useMemo(
-    () => stats.achievements
-      .filter(a => !a.unlocked)
-      .sort((a, b) => (b.progress / b.target) - (a.progress / a.target))
-      .slice(0, 3),
-    [stats.achievements]
-  );
-
-  const comboMult = (1 + Math.min(Math.max(stats.bestCombo - 1, 0), 10) * 0.1).toFixed(1);
   const ringPct = totalCount > 0 ? completedCount / totalCount : 0;
   const R = 52, STROKE = 8, C = 2 * Math.PI * R;
 
@@ -137,10 +82,6 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
           <p className="text-sm text-zinc-500 tracking-wide">{dateLabel}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={handleExport} aria-label="Copy daily log" className="md:mr-2 min-h-[44px] min-w-[44px] px-3 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 active:text-emerald-600 dark:active:text-emerald-400 transition-all flex items-center gap-2 text-xs font-semibold tracking-wide">
-            <Copy className="w-4 h-4" />
-            <span className="hidden sm:inline">Export</span>
-          </button>
           <button onClick={goBack} aria-label="Previous day" className="w-11 h-11 flex items-center justify-center rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 active:scale-95 transition-all">
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -184,7 +125,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
       <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] items-start">
         {/* ================= LEFT ================= */}
         <div className="space-y-5 md:space-y-6">
-          {/* ---- QUEST BOARD HERO ---- */}
+          {/* ---- HERO ---- */}
           <div className={`${card} relative overflow-hidden p-4 md:p-6`}>
             <div className="absolute inset-0 opacity-[0.08] pointer-events-none"
               style={{ background: `radial-gradient(90% 120% at 100% 0%, ${allDone ? '#34d399' : '#a78bfa'}, transparent 65%)` }} />
@@ -204,24 +145,16 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
 
               <div className="flex-1 min-w-[150px]">
                 <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500">
-                  {isTodaySelected ? "Today's Board" : `${format(selectedDate, 'EEEE')}'s Board`}
+                  {isTodaySelected ? "Today" : format(selectedDate, 'EEEE')}
                 </p>
                 <h3 className="mt-1 text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
                   {totalCount === 0 ? 'Nothing scheduled'
-                    : allDone ? 'Board cleared 🎉'
-                    : `${totalCount - completedCount} quest${totalCount - completedCount === 1 ? '' : 's'} remaining`}
+                    : allDone ? 'All done'
+                    : `${totalCount - completedCount} habit${totalCount - completedCount === 1 ? '' : 's'} remaining`}
                 </h3>
                 <div className="mt-3 md:mt-4 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                    <Swords className="w-3.5 h-3.5" /> +{boardXp} XP banked
-                  </span>
-                  {stats.bestCombo >= 2 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/25 text-[11px] font-bold text-orange-600 dark:text-orange-400">
-                      <Flame className="w-3.5 h-3.5" /> ×{comboMult} combo
-                    </span>
-                  )}
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 text-[11px] font-bold text-zinc-600 dark:text-zinc-300">
-                    <Trophy className="w-3.5 h-3.5" /> {stats.totalXp} XP total
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> {completedCount}/{totalCount} done
                   </span>
                 </div>
               </div>
@@ -239,7 +172,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h4 className="text-sm font-semibold text-red-800 dark:text-red-400">Discipline Threshold Breached</h4>
-                      <InfoTooltip text="Triggered when your 14-day completion rate falls below your configured discipline threshold." />
+                      <InfoTooltip text="Triggered when your 14-day completion rate falls below your discipline threshold (default 80%)." />
                     </div>
                     <p className="text-xs text-red-600 dark:text-red-300/80 mt-1">{disciplineConfig.message}</p>
                     <div className="mt-3 flex items-center gap-3">
@@ -254,13 +187,13 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
             )}
           </AnimatePresence>
 
-          {/* ---- Quests ---- */}
+          {/* ---- Habit list ---- */}
           <div className="space-y-3 relative">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">Daily Quests</h3>
+              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">Habits</h3>
               {totalCount > 0 && (
                 <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                  {completedCount}/{totalCount} cleared
+                  {completedCount}/{totalCount} done
                 </span>
               )}
             </div>
@@ -273,8 +206,8 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
                     <div className="w-16 h-16 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center mx-auto mb-5 text-zinc-400">
                       <LayoutList className="w-8 h-8 stroke-[1.5]" />
                     </div>
-                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2 tracking-tight">No quests yet</h3>
-                    <p className="text-xs text-zinc-500 tracking-wide max-w-sm mx-auto">Head to Quests to build your first routine. Every completion banks XP.</p>
+                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2 tracking-tight">No habits yet</h3>
+                    <p className="text-xs text-zinc-500 tracking-wide max-w-sm mx-auto">Head to Habits to build your first routine.</p>
                   </>
                 ) : (
                   <>
@@ -282,7 +215,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
                       <Coffee className="w-8 h-8 stroke-[1.5]" />
                     </div>
                     <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2 tracking-tight">Rest Day</h3>
-                    <p className="text-xs text-zinc-500 tracking-wide max-w-sm mx-auto">No quests scheduled for {format(selectedDate, 'EEEE')}. Recovery counts too.</p>
+                    <p className="text-xs text-zinc-500 tracking-wide max-w-sm mx-auto">No habits scheduled for {format(selectedDate, 'EEEE')}. Recovery counts too.</p>
                   </>
                 )}
               </motion.div>
@@ -297,8 +230,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
                       onToggle={() => toggleLog(habit.id, dateStr)}
                       currentAmount={logs.find(l => l.habitId === habit.id && l.date === dateStr)?.amount}
                       onLogAmount={(amount) => logAmount(habit.id, dateStr, amount)}
-                      xp={xpFor(habit, false)}
-                      combo={getStreak(habit.id).current}
+                      streak={getStreak(habit.id).current}
                     />
                   </motion.div>
                 ))}
@@ -307,7 +239,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
                   <motion.div layout className="flex items-center gap-4 py-3 opacity-50">
                     <div className="flex-1 h-[1px] bg-zinc-300 dark:bg-zinc-700" />
                     <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Cleared
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Done
                     </span>
                     <div className="flex-1 h-[1px] bg-zinc-300 dark:bg-zinc-700" />
                   </motion.div>
@@ -321,8 +253,7 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
                       onToggle={() => toggleLog(habit.id, dateStr)}
                       currentAmount={logs.find(l => l.habitId === habit.id && l.date === dateStr)?.amount}
                       onLogAmount={(amount) => logAmount(habit.id, dateStr, amount)}
-                      xp={xpFor(habit, true)}
-                      combo={getStreak(habit.id).current}
+                      streak={getStreak(habit.id).current}
                     />
                   </motion.div>
                 ))}
@@ -333,161 +264,36 @@ const TodayView: React.FC<TodayViewProps> = ({ habits, logs, isCompleted, toggle
 
         {/* ================= RIGHT ================= */}
         <div className="space-y-5 md:space-y-6">
-          {/* Progress card */}
-          {totalCount > 0 && (
-            <div className={`${card} p-4 md:p-5`}>
-              <div className="flex items-end justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${allDone ? 'bg-emerald-500 text-white' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}`}>
-                    {allDone ? <CheckCircle2 className="w-4 h-4" /> : <Target className="w-4 h-4" />}
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-0.5">Board Progress</p>
-                    <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                      {completedCount} <span className="text-zinc-400">/ {totalCount}</span>
-                    </span>
-                  </div>
+          {/* Numbers */}
+          <div className={`${card} p-4 md:p-5`}>
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3">The Run</h3>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg py-3 px-1 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <TrendingUp className="w-3 h-3 text-emerald-500" />
+                  <span className="text-[10px] uppercase tracking-widest text-zinc-500 truncate">14-day</span>
                 </div>
-                <span className={`text-2xl font-semibold tracking-tight ${allDone ? 'text-emerald-500' : 'text-zinc-900 dark:text-white'}`}>
-                  {Math.round(progressPct)}<span className="text-sm font-normal text-zinc-500">%</span>
-                </span>
+                <p className="text-lg font-bold text-zinc-900 dark:text-white tabular-nums">{disciplineInfo.rate.toFixed(0)}%</p>
               </div>
-              <div className="h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                <motion.div initial={{ width: 0 }} animate={{ width: `${progressPct}%` }} transition={{ duration: 0.5, ease: 'easeOut' }}
-                  className={`h-full rounded-full ${allDone ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-zinc-900 dark:bg-zinc-100'}`} />
+              <div className="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg py-3 px-1 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                  <span className="text-[10px] uppercase tracking-widest text-zinc-500 truncate">Check-ins</span>
+                </div>
+                <p className="text-lg font-bold text-zinc-900 dark:text-white tabular-nums">{totalCheckIns}</p>
               </div>
-            </div>
-          )}
-
-          {/* Momentum */}
-          <div className={`${card} p-5 relative overflow-hidden`}>
-            <div className="absolute top-0 right-0 p-4 opacity-10"><TrendingUp className="w-20 h-20 text-emerald-500" /></div>
-            <div className="relative">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Momentum</h3>
-                <InfoTooltip text="Your total active momentum score. Compounds at 5% daily on active streaks, but suffers a full reset if you miss a day." />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight tabular-nums">{momentumData.currentScore}</span>
-                <span className="text-sm font-medium text-emerald-600 dark:text-emerald-500 bg-emerald-100 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md">pts</span>
-              </div>
-              <div className="flex items-start gap-3 mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800/80">
-                {momentumData.droppedRecently ? (
-                  <>
-                    <div className="p-1.5 rounded-md bg-rose-100 dark:bg-rose-500/20 mt-0.5"><AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-500" /></div>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-                      <span className="text-rose-600 dark:text-rose-400">Drag detected.</span> Starting over costs 10× more than staying consistent.
-                    </p>
-                  </>
-                ) : momentumData.currentScore > momentumData.baseSum ? (
-                  <>
-                    <div className="p-1.5 rounded-md bg-emerald-100 dark:bg-emerald-500/20 mt-0.5"><TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-500" /></div>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-                      <span className="text-emerald-600 dark:text-emerald-400">Compounding.</span> Your effort is growing at +5% daily.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <div className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 mt-0.5"><Target className="w-4 h-4 text-zinc-500" /></div>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-                      Building the base. Hold a streak to switch on compounding.
-                    </p>
-                  </>
-                )}
+              <div className="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg py-3 px-1 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Flame className="w-3 h-3 text-amber-500" />
+                  <span className="text-[10px] uppercase tracking-widest text-zinc-500 truncate">Best run</span>
+                </div>
+                <p className="text-lg font-bold text-zinc-900 dark:text-white tabular-nums">{longestStreak}d</p>
               </div>
             </div>
+            <p className="text-[11px] text-zinc-500 mt-3 leading-relaxed">
+              Consistency over intensity. The 14-day rate is your rolling completion across every scheduled habit.
+            </p>
           </div>
-
-          <div className={`${card} p-4`}>
-            <MomentumChart data={momentumData.history} />
-          </div>
-
-          {/* Next badges */}
-          {nextBadges.length > 0 && (
-            <div className={`${card} p-4 md:p-5`}>
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Next Unlocks</h3>
-              <ul className="space-y-3">
-                {nextBadges.map(a => {
-                  const t = TIER_STYLE[a.tier];
-                  const Icon = ACHIEVEMENT_ICONS[a.icon] ?? Lock;
-                  const pct = Math.min(100, (a.progress / a.target) * 100);
-                  return (
-                    <li key={a.id} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border"
-                        style={{ backgroundColor: `${t.text}14`, borderColor: `${t.text}44` }}>
-                        <Icon className="w-4 h-4" style={{ color: t.text }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">{a.name}</p>
-                          <span className="text-[10px] text-zinc-500 tabular-nums flex-shrink-0">{a.progress}/{a.target}</span>
-                        </div>
-                        <div className="mt-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: t.text }} />
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-
-          {/* Value tracker */}
-          {valueConfig.active && (
-            <div className={`${card} p-4 md:p-5`}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center border border-emerald-200 dark:border-emerald-500/30">
-                  <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Value Today</p>
-                    <InfoTooltip text="The total accrued value of all habits completed today." />
-                  </div>
-                  <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                    {totalValueAccumulated} <span className="text-sm text-zinc-400 font-medium">{valueConfig.symbol}</span>
-                  </p>
-                </div>
-              </div>
-              <div className="flex justify-between items-end mb-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Weekly Target</p>
-                <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
-                  ~{valueConfig.target ? Math.round((totalValueAccumulated / valueConfig.target) * 100) : 0}%
-                </span>
-              </div>
-              <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full"
-                  style={{ width: `${valueConfig.target ? Math.min(100, (totalValueAccumulated / valueConfig.target) * 100) : 0}%` }} />
-              </div>
-            </div>
-          )}
-
-          {/* Pillars */}
-          {pillarStats.length > 0 && (
-            <div className={`${card} p-4 md:p-5`}>
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Domains</h3>
-              <div className="space-y-3">
-                {pillarStats.map(p => (
-                  <div key={p.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700"
-                      style={{ backgroundColor: p.color + '15', color: p.color }}>
-                      {emojiToIcon(p.icon, 'w-4 h-4')}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center mb-1">
-                        <p className="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 truncate">{p.name}</p>
-                        <span className="text-[9px] text-zinc-500 tabular-nums">{p.completed}/{p.total}</span>
-                      </div>
-                      <div className="h-1 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${p.progress}%`, backgroundColor: p.color }} />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </motion.div>

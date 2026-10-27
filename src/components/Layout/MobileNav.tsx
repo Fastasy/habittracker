@@ -1,38 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Swords, ListChecks, BarChart3, Moon, Sun, Settings, Target, Dumbbell, CalendarDays,
-  Trophy, X, MoreHorizontal, Check,
+  Swords, ListChecks, Moon, Sun, Settings, Dumbbell, CalendarDays,
+  X, MoreHorizontal,
 } from 'lucide-react';
 import { ViewType } from '../../types/habit';
 import { useTheme } from '../../contexts/ThemeContext';
-import { GameStats } from '../../game/types';
 
 interface MobileNavProps {
   currentView: ViewType;
   onViewChange: (view: ViewType) => void;
-  stats?: GameStats;
 }
 
 /**
- * Five tabs is the most that stays legible — and tappable — at 360px.
- * The other four destinations live in the "More" sheet, which is also what
- * gives Trophies a mobile entry point at all (it used to be HUD-only).
+ * Four tabs is the most that stays legible — and tappable — at 360px.
+ * Settings lives in the "More" sheet.
  */
 const primaryTabs = [
-  { id: 'today' as ViewType, label: 'Command', icon: Swords },
+  { id: 'today' as ViewType, label: 'Today', icon: Swords },
   { id: 'calendar' as ViewType, label: 'Calendar', icon: CalendarDays },
-  { id: 'habits' as ViewType, label: 'Quests', icon: ListChecks },
-  { id: 'analytics' as ViewType, label: 'Stats', icon: BarChart3 },
+  { id: 'habits' as ViewType, label: 'Habits', icon: ListChecks },
+  { id: 'fitness' as ViewType, label: 'Training', icon: Dumbbell },
 ];
 
-const moreNavItems: { id: ViewType; label: string; hint: string; icon: typeof Target }[] = [
-  { id: 'goals', label: 'Campaigns', hint: 'Long-haul objectives', icon: Target },
-  { id: 'fitness', label: 'Training', hint: 'Weight & biometrics', icon: Dumbbell },
-  { id: 'achievements', label: 'Trophies', hint: 'Badges you have earned', icon: Trophy },
-  { id: 'settings', label: 'Setup', hint: 'Pillars, values, lock', icon: Settings },
+const moreNavItems: { id: ViewType; label: string; hint: string; icon: typeof Settings }[] = [
+  { id: 'settings', label: 'Settings', hint: 'Lock & theme', icon: Settings },
 ];
 
-const MobileNav: React.FC<MobileNavProps> = ({ currentView, onViewChange, stats }) => {
+const MobileNav: React.FC<MobileNavProps> = ({ currentView, onViewChange }) => {
   const { isDark, toggleDark } = useTheme();
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -55,17 +49,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ currentView, onViewChange, stats 
     <>
       {/* Top bar */}
       <header className="md:hidden safe-top-bar fixed top-0 left-0 right-0 z-30 bg-zinc-50/85 dark:bg-zinc-950/85 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-900/50 px-4 pb-2.5 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="font-semibold text-zinc-900 dark:text-white uppercase tracking-tight text-base">Streakly</span>
-          {stats && (
-            <span
-              className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md border flex-shrink-0 truncate max-w-[45vw]"
-              style={{ color: stats.rank.color, borderColor: `${stats.rank.color}55`, backgroundColor: `${stats.rank.color}14` }}
-            >
-              LVL {stats.level} · {stats.rank.name}
-            </span>
-          )}
-        </div>
+        <span className="font-semibold text-zinc-900 dark:text-white uppercase tracking-tight text-base">Streakly</span>
         <button
           onClick={toggleDark}
           aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -84,10 +68,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ currentView, onViewChange, stats 
           />
           <div className="absolute left-0 right-0 bottom-0 animate-sheet-up rounded-t-3xl border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 shadow-2xl">
             <div className="flex items-center justify-between px-5 pt-4 pb-2">
-              <div className="flex items-center gap-2.5">
-                <span className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">More</h2>
-              </div>
+              <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">More</h2>
               <button
                 onClick={() => setSheetOpen(false)}
                 aria-label="Close menu"
@@ -112,7 +93,6 @@ const MobileNav: React.FC<MobileNavProps> = ({ currentView, onViewChange, stats 
                   >
                     <div className="flex w-full items-center justify-between">
                       <Icon className={`w-5 h-5 stroke-[1.5] ${isActive ? 'text-emerald-500' : 'text-zinc-500'}`} />
-                      {isActive && <Check className="w-4 h-4 text-emerald-500" strokeWidth={3} />}
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{label}</p>

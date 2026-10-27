@@ -7,7 +7,6 @@ import {
   Check,
   StickyNote,
   Loader2,
-  Target,
   Undo2,
   ArrowRight,
 } from 'lucide-react';
@@ -24,7 +23,6 @@ import {
   startOfWeek,
 } from 'date-fns';
 import { CalendarApi } from '../../hooks/useCalendar';
-import { Goal } from '../../types/habit';
 import { toDateString } from '../../utils/dateUtils';
 import { isMissed, isCarriedIn, carriedDays, shortDate } from '../../utils/todoUtils';
 
@@ -35,16 +33,14 @@ const card =
 
 interface CalendarViewProps {
   calendar: CalendarApi;
-  goals: Goal[];
 }
 
-const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
+const CalendarView: React.FC<CalendarViewProps> = ({ calendar }) => {
   const {
     isLoading,
     addTodo,
     toggleTodo,
     deleteTodo,
-    setTodoGoal,
     saveNote,
     todosFor,
     openCount,
@@ -63,8 +59,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
   const [draftFor, setDraftFor] = useState<string>('');
   const [savedAt, setSavedAt] = useState('');
   const [draft, setDraft] = useState('');
-  const [draftGoal, setDraftGoal] = useState('');
-  const [linkEditId, setLinkEditId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   // On a phone the day panel sits below the month grid, so selecting a day
   // would otherwise look like nothing happened.
@@ -109,13 +103,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
     [calendar.todos, month, todayIso]
   );
 
-  const goalById = (id?: string) => (id ? goals.find(g => g.id === id) : undefined);
-
   const selectDay = (iso: string) => {
     // Flush the in-flight note before switching days.
     if (draftFor === selected) saveNote(selected, noteDraft);
     setSelected(iso);
-    setLinkEditId(null);
     if (!isSameMonth(parseISO(iso), month)) setMonth(startOfMonth(parseISO(iso)));
     // Only on the stacked mobile layout — on desktop the panel is already visible.
     if (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches) {
@@ -126,9 +117,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
   const submitTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (!draft.trim()) return;
-    addTodo(selected, draft, draftGoal || undefined);
+    addTodo(selected, draft);
     setDraft('');
-    setDraftGoal('');
     inputRef.current?.focus();
   };
 
@@ -334,36 +324,19 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                   placeholder="Add a to-do (press Enter)"
                   className="w-full px-3 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
                 />
-                <div className="flex gap-2">
-                  <select
-                    value={draftGoal}
-                    onChange={e => setDraftGoal(e.target.value)}
-                    disabled={goals.length === 0}
-                    aria-label="Link to objective"
-                    className="flex-1 min-w-0 px-2 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <option value="">No objective</option>
-                    {goals.map(g => (
-                      <option key={g.id} value={g.id}>
-                        {g.name}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="submit"
-                    disabled={!draft.trim()}
-                    className="flex-shrink-0 min-h-[44px] inline-flex items-center gap-1 px-4 rounded-lg bg-zinc-900 active:bg-zinc-800 dark:bg-white dark:active:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={!draft.trim()}
+                  className="flex-shrink-0 min-h-[44px] inline-flex items-center gap-1 px-4 rounded-lg bg-zinc-900 active:bg-zinc-800 dark:bg-white dark:active:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
               </form>
 
               {dayTodos.length > 0 ? (
                 <ul className="mt-3 divide-y divide-dashed divide-zinc-200 dark:divide-zinc-800">
                   {dayTodos.map(t => {
-                    const g = goalById(t.goalId);
                     const missed = isMissed(t, todayIso);
                     const carriedIn = isCarriedIn(t);
                     const overdue = carriedDays(t);
@@ -421,7 +394,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                           </button>
                         </div>
 
-                        {/* Roll-over history + goal link */}
+                        {/* Roll-over history */}
                         <div className="ml-11 md:ml-7 mb-1.5 flex flex-wrap items-center gap-1">
                           {/* The accountability chip is for work that is STILL
                               owed. Once it is done the miss stays recorded on
@@ -449,50 +422,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ calendar, goals }) => {
                             </span>
                           )}
 
-                          {linkEditId === t.id ? (
-                            <select
-                              autoFocus
-                              value={t.goalId ?? ''}
-                              onChange={e => {
-                                setTodoGoal(t.id, e.target.value || undefined);
-                                setLinkEditId(null);
-                              }}
-                              onBlur={() => setLinkEditId(null)}
-                              aria-label="Link to objective"
-                              className="max-w-full px-2 py-1.5 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-[11px] text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                            >
-                              <option value="">No objective</option>
-                              {goals.map(goal => (
-                                <option key={goal.id} value={goal.id}>
-                                  {goal.name}
-                                </option>
-                              ))}
-                            </select>
-                          ) : g ? (
-                            <button
-                              onClick={() => setLinkEditId(t.id)}
-                              data-goal-chip={g.id}
-                              title="Change or clear the linked objective"
-                              className="inline-flex items-center gap-1 max-w-full min-h-[44px] px-2.5 rounded-full border text-[11px] font-medium transition-colors active:opacity-80"
-                              style={{
-                                borderColor: `${g.color?.startsWith('#') ? g.color : '#10b981'}40`,
-                                backgroundColor: `${g.color?.startsWith('#') ? g.color : '#10b981'}14`,
-                                color: g.color?.startsWith('#') ? g.color : '#10b981',
-                              }}
-                            >
-                              <Target className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate">{g.name}</span>
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => setLinkEditId(t.id)}
-                              title="Link this to-do to an objective"
-                              className="inline-flex items-center gap-1 min-h-[44px] px-2.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 text-[11px] text-zinc-400 dark:text-zinc-600 active:text-zinc-700 dark:active:text-zinc-300 transition-colors"
-                            >
-                              <Plus className="w-3 h-3" />
-                              goal
-                            </button>
-                          )}
                         </div>
                       </li>
                     );

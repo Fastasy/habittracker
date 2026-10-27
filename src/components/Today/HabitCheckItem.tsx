@@ -9,10 +9,8 @@ interface HabitCheckItemProps {
   onToggle: () => void;
   currentAmount?: number;
   onLogAmount?: (amount: number) => void;
-  /** XP this check-in banks (game layer). Optional — omit to hide. */
-  xp?: number;
-  /** Current streak, shown as a combo multiplier. */
-  combo?: number;
+  /** Current streak, shown as a run counter. */
+  streak?: number;
 }
 
 /**
@@ -23,7 +21,7 @@ interface HabitCheckItemProps {
  * checkbox button is padded out to a full 44px hit area anyway, because on
  * touch a control that *looks* like the thing to press gets pressed.
  */
-const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onToggle, currentAmount = 0, onLogAmount, xp, combo = 0 }) => {
+const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onToggle, currentAmount = 0, onLogAmount, streak = 0 }) => {
   const [justCompleted, setJustCompleted] = useState(false);
   const [tempAmount, setTempAmount] = useState(currentAmount.toString());
 
@@ -128,24 +126,12 @@ const HabitCheckItem: React.FC<HabitCheckItemProps> = ({ habit, completed, onTog
           >
             {habit.name}
           </p>
-          {typeof xp === 'number' && (
-            <span
-              className={`flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded border tabular-nums transition-colors ${
-                completed
-                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-                  : 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20'
-              }`}
-              title="XP banked for clearing this quest"
-            >
-              +{xp} XP
-            </span>
-          )}
-          {combo >= 2 && (
+          {streak >= 2 && (
             <span
               className="flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded border text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/25 tabular-nums"
-              title="Active streak"
+              title="Current streak"
             >
-              🔥 {combo}d
+              🔥 {streak}d
             </span>
           )}
         </div>

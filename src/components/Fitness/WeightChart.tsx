@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from 'recharts';
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { Activity } from 'lucide-react';
 
@@ -69,7 +69,7 @@ const WeightChart: React.FC<WeightChartProps> = ({ data }) => {
           }}
           itemStyle={{ color: '#10b981' }} // emerald-500
           labelStyle={{ color: '#71717a', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}
-          formatter={(value: number) => [`${value} kg`, 'Weight']}
+          formatter={(value) => [`${value ?? 0} kg`, 'Weight']}
           cursor={{ stroke: 'rgba(16,185,129,0.3)', strokeWidth: 1, strokeDasharray: '3 3' }}
         />
         <Area

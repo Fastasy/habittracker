@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Activity, Scale } from 'lucide-react';
 import { DateRangeFilter } from '../../types/habit';
 import { getLastNDays, toDateString } from '../../utils/dateUtils';
-import WeightChart from '../Analytics/WeightChart';
+import WeightChart from './WeightChart';
 
 interface FitnessViewProps {
   getWeightLog: (date: string) => number | undefined;
@@ -48,10 +48,10 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 mb-2 md:mb-8">
         <div className="min-w-0">
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            Physiology
+            Training
           </h2>
           <p className="text-sm text-zinc-500 tracking-wide mt-1">
-            Track your biometrics and body composition.
+            Log your weight and watch the trend.
           </p>
         </div>
       </header>
@@ -64,7 +64,7 @@ const FitnessView: React.FC<FitnessViewProps> = ({ getWeightLog, logWeight, getW
               <Scale className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">Body Mass Index</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">Weight Log</p>
               <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 tracking-wide">
                 Logging for {selectedDate.toLocaleDateString()}
               </p>

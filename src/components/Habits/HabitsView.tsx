@@ -55,9 +55,9 @@ const HabitsView: React.FC<HabitsViewProps> = ({
       {/* Header */}
       <div className="flex items-end justify-between gap-3 mb-5 md:mb-8">
         <div className="min-w-0">
-          <h2 className="text-2xl md:text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">Quest Log</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-zinc-900 dark:text-white tracking-tight">Habits</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-500 tracking-wide mt-1">
-            {habits.length === 0 ? 'No quests configured' : `${habits.length} quest${habits.length !== 1 ? 's' : ''} active`}
+            {habits.length === 0 ? 'No habits configured' : `${habits.length} habit${habits.length !== 1 ? 's' : ''} active`}
           </p>
         </div>
         <button
@@ -65,7 +65,7 @@ const HabitsView: React.FC<HabitsViewProps> = ({
           className="flex-shrink-0 flex items-center gap-2 min-h-[44px] px-3.5 md:px-4 bg-zinc-900 dark:bg-white active:bg-zinc-800 dark:active:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-sm"
         >
           <Plus className="w-4 h-4" />
-          <span>New Quest</span>
+          <span>New Habit</span>
         </button>
       </div>
 
@@ -75,7 +75,7 @@ const HabitsView: React.FC<HabitsViewProps> = ({
           <div className="w-16 h-16 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center mx-auto mb-5 text-zinc-400">
             <LayoutList className="w-8 h-8 stroke-[1.5]" />
           </div>
-          <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2 tracking-tight">System Empty</h3>
+          <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2 tracking-tight">No habits yet</h3>
           <p className="text-xs text-zinc-500 tracking-wide max-w-sm mx-auto mb-6">
             You haven't defined any routines yet. Start by creating your first habit below.
           </p>
@@ -84,7 +84,7 @@ const HabitsView: React.FC<HabitsViewProps> = ({
             className="inline-flex items-center gap-2 min-h-[44px] px-4 bg-zinc-900 dark:bg-white active:bg-zinc-800 dark:active:bg-zinc-200 text-white dark:text-zinc-900 font-medium rounded-lg shadow-sm transition-all text-xs uppercase tracking-wider"
           >
             <Plus className="w-4 h-4" />
-            Create Quest
+            Create Habit
           </button>
         </div>
       )}
@@ -111,7 +111,7 @@ const HabitsView: React.FC<HabitsViewProps> = ({
             <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-colors">
               <Plus className="w-5 h-5 text-zinc-400 group-hover:text-emerald-500 transition-colors" />
             </div>
-            <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500 group-hover:text-emerald-500 transition-colors">Add Quest</span>
+            <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500 group-hover:text-emerald-500 transition-colors">Add Habit</span>
           </button>
         </div>
       )}
