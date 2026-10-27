@@ -13,6 +13,11 @@
 --   select count(*) from pillars;
 --   select count(*) from user_settings;
 
+-- habits.pillar_id is a legacy column the app never reads/writes; its FK is
+-- the only dependency blocking the pillar drop. Remove the constraint (the
+-- column itself stays — harmless, and DROP COLUMN would touch the app's shape).
+alter table habits drop constraint if exists habits_pillar_id_fkey;
+
 drop table if exists reminders;
 drop table if exists push_subscriptions;
 drop table if exists pillars;
